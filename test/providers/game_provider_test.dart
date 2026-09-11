@@ -242,9 +242,11 @@ void main() {
     // Bölüm değiştirmek yarım kalmış ilerlemeyi taşımamalı.
     test('startSection ilerlemeyi ve skoru sıfırlar', () {
       final game = GameProvider();
-      game.answer(game.currentQuestion.options.firstWhere(
-        (o) => game.currentQuestion.isCorrect(o),
-      ));
+      game.answer(
+        game.currentQuestion.options.firstWhere(
+          (o) => game.currentQuestion.isCorrect(o),
+        ),
+      );
       game.nextQuestion();
       expect(game.questionNumber, 2);
 

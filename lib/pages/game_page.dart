@@ -15,32 +15,44 @@ class GamePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final game = context.watch<GameProvider>();
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        title: Text('Soru ${game.questionNumber} / ${game.totalQuestions}'),
-      ),
-      body: SafeArea(
-        // Küçük ekranda veya büyük yazı tipi ayarında içerik sığmayabilir.
-        // Taşma yerine kaydırma istiyoruz.
-        //
-        // Kalıp şu: SingleChildScrollView içeriği serbest bırakır,
-        // ConstrainedBox ise "en az ekran kadar uzun ol" der.
-        // Böylece içerik kısaysa Center ortalar, uzunsa kaydırılır.
-        child: LayoutBuilder(
-          builder: (context, kisit) {
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: kisit.maxHeight - 40),
-                // Center yatay ortalama için de şart
-                // (bkz. test/layout_test.dart).
-                child: const Center(child: _QuestionView()),
-              ),
-            );
-          },
+    // PopScope: bu sayfadan GERİ çıkılınca haber verir.
+    //
+    // Soru okunurken geri tuşuna basılırsa ses ana sayfada da
+    // sürüyordu. Sayfa kapanırken sesi durduruyoruz.
+    //
+    // context.read callback İÇİNDE: Provider, build sırasında
+    // read çağrılmasına izin vermez.
+    return PopScope(
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) context.read<GameProvider>().stopAudio();
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          title: Text('Soru ${game.questionNumber} / ${game.totalQuestions}'),
+        ),
+        body: SafeArea(
+          // Küçük ekranda veya büyük yazı tipi ayarında içerik sığmayabilir.
+          // Taşma yerine kaydırma istiyoruz.
+          //
+          // Kalıp şu: SingleChildScrollView içeriği serbest bırakır,
+          // ConstrainedBox ise "en az ekran kadar uzun ol" der.
+          // Böylece içerik kısaysa Center ortalar, uzunsa kaydırılır.
+          child: LayoutBuilder(
+            builder: (context, kisit) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: kisit.maxHeight - 40),
+                  // Center yatay ortalama için de şart
+                  // (bkz. test/layout_test.dart).
+                  child: const Center(child: _QuestionView()),
+                ),
+              );
+            },
+          ),
         ),
       ),
     );

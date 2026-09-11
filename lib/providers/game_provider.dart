@@ -188,6 +188,13 @@ class GameProvider extends ChangeNotifier {
     _audio.speak(mesaj);
   }
 
+  /// Devam eden okumayı durdurur.
+  ///
+  /// Sayfadan çıkılınca çağrılır: çocuk soru okunurken geri tuşuna
+  /// basarsa ses ana sayfada devam etmemeli.
+  /// notifyListeners YOK: ekranda değişen bir durum yok.
+  void stopAudio() => _audio.stop();
+
   /// Soruyu tekrar okur. Çocuk kaçırırsa 🔊 butonuyla tetiklenir.
   void repeatQuestion() => _speakCurrentQuestion();
 

@@ -29,9 +29,9 @@ void main() {
 
   /// Verilen widget'ların oluşturduğu grubun yatay merkezi.
   double grupMerkezi(WidgetTester tester, Finder finder) {
-    final rects = finder.evaluate().map((e) => tester.getRect(find.byWidget(
-          e.widget,
-        )));
+    final rects = finder.evaluate().map(
+      (e) => tester.getRect(find.byWidget(e.widget)),
+    );
     final sol = rects.map((r) => r.left).reduce((a, b) => a < b ? a : b);
     final sag = rects.map((r) => r.right).reduce((a, b) => a > b ? a : b);
     return (sol + sag) / 2;

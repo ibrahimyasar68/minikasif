@@ -40,7 +40,10 @@ void main() {
     await bolumuAc(tester);
 
     AnimatedOpacity muzKarti() => tester.widget<AnimatedOpacity>(
-      find.ancestor(of: find.text('Muz'), matching: find.byType(AnimatedOpacity)),
+      find.ancestor(
+        of: find.text('Muz'),
+        matching: find.byType(AnimatedOpacity),
+      ),
     );
 
     expect(muzKarti().opacity, 1.0);

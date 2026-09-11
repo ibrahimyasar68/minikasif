@@ -31,7 +31,7 @@ void main() {
   test('audioText verilirse spokenText onu kullanır', () {
     const sesli = Question(
       id: 'q2',
-    section: GameSection.fruits,
+      section: GameSection.fruits,
       questionText: 'Kırmızı elmayı bul',
       audioText: 'Haydi bakalım, kırmızı elmaya dokun!',
       options: [elma, muz],

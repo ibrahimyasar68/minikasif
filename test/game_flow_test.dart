@@ -180,8 +180,11 @@ void main() {
       await tester.pumpAndSettle();
       await bolumuBitir(tester, hataliSayisi: 4);
 
-      expect(find.byIcon(Icons.star), findsNWidgets(1),
-          reason: 'önceki turun skoru taşınmamalı');
+      expect(
+        find.byIcon(Icons.star),
+        findsNWidgets(1),
+        reason: 'önceki turun skoru taşınmamalı',
+      );
     });
   });
 

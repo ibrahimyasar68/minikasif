@@ -94,8 +94,10 @@ void main() {
     game.repeatQuestion();
 
     expect(audio.spoken, hasLength(2));
-    expect(audio.spoken.every((t) => t == game.currentQuestion.spokenText),
-        isTrue);
+    expect(
+      audio.spoken.every((t) => t == game.currentQuestion.spokenText),
+      isTrue,
+    );
   });
 
   test('yanlış cevap soruyu tekrar okumaz', () {
