@@ -37,7 +37,10 @@ const _balon = AnswerOption(id: 'balon', label: 'Balon', emoji: '🎈');
 const _kitap = AnswerOption(id: 'kitap', label: 'Kitap', emoji: '📕');
 const _ucak = AnswerOption(id: 'ucak', label: 'Uçak', emoji: '✈️');
 const _semsiye = AnswerOption(id: 'semsiye', label: 'Şemsiye', emoji: '☂️');
-const _ayicik = AnswerOption(id: 'ayicik', label: 'Ayıcık', emoji: '🧸');
+// Davul (🥁), "oyuncak ayı"nın (🧸) yerine geçti. 🧸 Unicode 11 (2018);
+// Android 8 telefonun emoji fontunda YOK ve çocuk boş bir kart görüyordu.
+// Emoji seçerken eski cihaz kapsamına bakın: test/data/emoji_kapsami_test.dart
+const _davul = AnswerOption(id: 'davul', label: 'Davul', emoji: '🥁');
 const _bisiklet = AnswerOption(id: 'bisiklet', label: 'Bisiklet', emoji: '🚲');
 const _saat = AnswerOption(id: 'saat', label: 'Saat', emoji: '⏰');
 const _kalem = AnswerOption(id: 'kalem', label: 'Kalem', emoji: '✏️');
@@ -250,9 +253,10 @@ const List<Question> allQuestions = [
   Question(
     id: 'o7',
     section: GameSection.objects,
-    questionText: 'Oyuncak ayıyı bul',
-    options: [_balon, _top, _ayicik, _saat],
-    correctOptionId: 'ayicik',
+    questionText: 'Davulu bul',
+    audioText: 'Dum dum! Davula dokun.',
+    options: [_balon, _top, _davul, _saat],
+    correctOptionId: 'davul',
   ),
   Question(
     id: 'o8',
