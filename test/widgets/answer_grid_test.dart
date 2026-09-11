@@ -111,4 +111,27 @@ void main() {
 
     expect(satirSayisi(tester), 2);
   });
+
+  // Soru başlığı sorudan soruya kaymasın diye kart alanı her zaman aynı
+  // yükseklikte olmalı.
+  testWidgets('kart alanı yüksekliği seçenek sayısından bağımsız', (
+    tester,
+  ) async {
+    final yukseklikler = <int, double>{};
+    for (final adet in [2, 3, 4]) {
+      await kur(tester, adet);
+      yukseklikler[adet] = tester.getSize(find.byType(AnswerGrid)).height;
+    }
+    expect(yukseklikler[2], yukseklikler[4]);
+    expect(yukseklikler[3], yukseklikler[4]);
+  });
+
+  testWidgets('tek sıralık kartlar alanın dikey ortasında durur', (
+    tester,
+  ) async {
+    await kur(tester, 3);
+    final alan = tester.getRect(find.byType(AnswerGrid));
+    final kart = tester.getRect(find.byType(AnswerCard).first);
+    expect(kart.center.dy, moreOrLessEquals(alan.center.dy, epsilon: 0.5));
+  });
 }

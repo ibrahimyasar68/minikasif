@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import '../models/answer_option.dart';
 import 'answer_card.dart';
@@ -57,6 +59,25 @@ class AnswerGrid extends StatelessWidget {
             .clamp(_enKucuk, _enBuyuk)
             .floorToDouble();
 
+        // Kart alanının YÜKSEKLİĞİ seçenek sayısından bağımsız.
+        //
+        // Her zaman 2 sıralık (2x2 düzenin) yüksekliği kadar yer kaplıyoruz;
+        // kartlar bu alanın ortasında duruyor. Eskiden alan 2-3 seçenekte
+        // tek sıra, 4 seçenekte iki sıra yüksekliğindeydi. İçerik ekranda
+        // dikey ortalandığı için soru başlığı sorudan soruya yukarı aşağı
+        // kayıyordu.
+        //
+        // max(): çok dar ekranda 3 kart mecburen 2+1 dizilirse gerçek
+        // yükseklik yine sığsın.
+        final ikiSutunBoyut = ((kisit.maxWidth - _bosluk) / 2)
+            .clamp(_enKucuk, _enBuyuk)
+            .floorToDouble();
+        final satir = (options.length / sutun).ceil();
+        final sabitYukseklik = math.max(
+          2 * ikiSutunBoyut + _bosluk,
+          satir * boyut + (satir - 1) * _bosluk,
+        );
+
         // Genişliği sütun sayısına göre SABİTLİYORUZ.
         //
         // Wrap "sığdığı kadar yan yana koy" der. Geniş ekranda (tablet)
@@ -71,24 +92,25 @@ class AnswerGrid extends StatelessWidget {
         // üst genişliğe büyütülür. "Kısıtlar yukarıdan aşağı iner": bir
         // çocuk sıkı kısıttan küçük olamaz. Center çocuğuna GEVŞEK kısıt
         // verir, böylece SizedBox istediği genişlikte kalabilir.
-        // heightFactor 1.0: yükseklik tam içerik kadar olsun, uzamasın.
-        return Center(
-          heightFactor: 1.0,
-          child: SizedBox(
-            width: sutun * boyut + (sutun - 1) * _bosluk,
-            child: Wrap(
-              spacing: _bosluk,
-              runSpacing: _bosluk,
-              alignment: WrapAlignment.center,
-              children: [
-                for (final option in options)
-                  AnswerCard(
-                    option: option,
-                    size: boyut,
-                    status: statusOf(option),
-                    onTap: onTap == null ? null : () => onTap!(option),
-                  ),
-              ],
+        return SizedBox(
+          height: sabitYukseklik,
+          child: Center(
+            child: SizedBox(
+              width: sutun * boyut + (sutun - 1) * _bosluk,
+              child: Wrap(
+                spacing: _bosluk,
+                runSpacing: _bosluk,
+                alignment: WrapAlignment.center,
+                children: [
+                  for (final option in options)
+                    AnswerCard(
+                      option: option,
+                      size: boyut,
+                      status: statusOf(option),
+                      onTap: onTap == null ? null : () => onTap!(option),
+                    ),
+                ],
+              ),
             ),
           ),
         );
