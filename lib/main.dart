@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'pages/home_page.dart';
 import 'providers/game_provider.dart';
+import 'providers/settings_provider.dart';
 import 'services/audio_service.dart';
+import 'theme/app_theme.dart';
 
-void main() {
-  runApp(const MiniKesifApp());
+Future<void> main() async {
+  // runApp'ten önce eklenti kullanacağımız için Flutter'ı hazırla.
+  WidgetsFlutterBinding.ensureInitialized();
+  // Ayarları runApp'ten ÖNCE yükle. Yoksa uygulama bir an sistem temasıyla
+  // açılıp sonra kayıtlı temaya geçer: ekran yanıp söner.
+  final prefs = await SharedPreferences.getInstance();
+  runApp(MiniKesifApp(prefs: prefs));
 }
 
 class MiniKesifApp extends StatelessWidget {
-  const MiniKesifApp({super.key, this.audio});
+  const MiniKesifApp({super.key, this.audio, this.prefs});
 
   /// Ses servisi. Verilmezse gerçek TTS kullanılır (uygulamanın kendisi).
   ///
@@ -20,31 +29,40 @@ class MiniKesifApp extends StatelessWidget {
   /// dokunmuyor - AudioService arayüzünün var olma sebebi tam olarak bu.
   final AudioService? audio;
 
+  /// Kalıcı ayar deposu. Verilmezse ayarlar sadece bellekte (testler).
+  final SharedPreferences? prefs;
+
   @override
   Widget build(BuildContext context) {
-    // ChangeNotifierProvider, GameProvider'ı widget ağacına yerleştirir.
-    //
-    // MaterialApp'in ÜSTÜNE koyduk. Neden?
-    // Provider'a sadece ALTINDAKİ widget'lar erişebilir.
-    // Buraya koyunca tüm sayfalar (HomePage, GamePage ve ileride
-    // ResultPage) aynı oyun durumuna ulaşabilir.
-    return ChangeNotifierProvider(
-      // create: provider'ı YALNIZCA BİR KEZ oluşturur.
-      // Ekran her yeniden çizildiğinde yeni bir oyun başlamaz.
-      // GERÇEK ses servisi SADECE burada bağlanıyor.
-      // Uygulamanın geri kalanı sadece AudioService arayüzünü tanıyor.
-      // Yarın TTS yerine .mp3 kullanmak istersek değişecek tek yer burası.
-      // ..sesiKontrolEt(): açılışta ses motorunu hazırla ve Türkçe desteğini
-      // öğren. Sonucu beklemiyoruz; gelince provider haber veriyor.
-      create: (context) =>
-          GameProvider(audio: audio ?? TtsAudioService())..sesiKontrolEt(),
-      child: MaterialApp(
-        title: 'MiniKesif',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
+    // MultiProvider: birden fazla provider'ı iç içe yazmak yerine liste.
+    // Sıra önemli: GameProvider SettingsProvider'ı okuyor, o yüzden altta.
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => SettingsProvider(prefs: prefs)),
+        ChangeNotifierProvider(
+          // Oyun "konuş" der; ToggleableAudioService ses ayarı kapalıysa
+          // yutar. context.read çağrısı her konuşmada yapılır: ayar
+          // değişince hemen etkili olur.
+          create: (context) => GameProvider(
+            audio: ToggleableAudioService(
+              audio ?? TtsAudioService(),
+              acikMi: () => context.read<SettingsProvider>().sesAcik,
+            ),
+          )..sesiKontrolEt(),
         ),
-        home: const HomePage(),
+      ],
+      // Selector: Consumer'ın seçici hâli. Provider'ın SADECE tema değerini
+      // dinler; ses ayarı değişince MaterialApp boşuna yeniden kurulmaz.
+      child: Selector<SettingsProvider, ThemeMode>(
+        selector: (_, ayarlar) => ayarlar.temaModu,
+        builder: (context, temaModu, _) => MaterialApp(
+          title: 'MiniKesif',
+          debugShowCheckedModeBanner: false,
+          theme: acikTema,
+          darkTheme: koyuTema,
+          themeMode: temaModu,
+          home: const HomePage(),
+        ),
       ),
     );
   }

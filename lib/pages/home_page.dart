@@ -3,7 +3,9 @@ import '../theme/app_colors.dart';
 import 'package:provider/provider.dart';
 import '../models/game_section.dart';
 import '../providers/game_provider.dart';
+import '../providers/settings_provider.dart';
 import 'game_page.dart';
+import 'settings_page.dart';
 
 /// Karşılama + bölüm seçim ekranı.
 class HomePage extends StatelessWidget {
@@ -18,42 +20,67 @@ class HomePage extends StatelessWidget {
     final turkceSesVar = context.select<GameProvider, bool?>(
       (oyun) => oyun.turkceSesVar,
     );
+    final sesAcik = context.select<SettingsProvider, bool>((a) => a.sesAcik);
+    final renk = AppColors.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: renk.background,
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            // Küçük ekranlarda 3 bölüm kartı sığmayabilir.
-            // Taşma hatası yerine kaydırma.
-            padding: const EdgeInsets.symmetric(vertical: 24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Sadece Türkçe ses KESİN yoksa (false). null = kontrol sürüyor.
-                if (turkceSesVar == false) const _TurkceSesUyarisi(),
-                const Text('🔍', style: TextStyle(fontSize: 80)),
-                const SizedBox(height: 8),
-                const Text(
-                  'Mini Keşif',
-                  style: TextStyle(
-                    fontSize: 44,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryDark,
-                  ),
-                ),
-                const SizedBox(height: 32),
+        // Stack: ayar simgesini içeriğin ÜSTÜNE bindiriyoruz; içerik
+        // yerinden oynamasın (bölüm butonları kaydırmadan görünmeli).
+        child: Stack(
+          children: [
+            Center(
+              child: SingleChildScrollView(
+                // Küçük ekranlarda 3 bölüm kartı sığmayabilir.
+                // Taşma hatası yerine kaydırma.
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Sadece Türkçe ses KESİN yoksa (false). null = kontrol sürüyor.
+                    // Ses kapalıysa uyarı anlamsız: ebeveyn sessizliği seçmiş.
+                    if (sesAcik && turkceSesVar == false)
+                      const _TurkceSesUyarisi(),
+                    const Text('🔍', style: TextStyle(fontSize: 80)),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Mini Keşif',
+                      style: TextStyle(
+                        fontSize: 44,
+                        fontWeight: FontWeight.bold,
+                        color: renk.primaryDark,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
 
-                // GameSection.values enum'un tüm değerlerini verir.
-                // Yeni bir bölüm eklersek bu ekran kendiliğinden günceller;
-                // burada elle liste tutmuyoruz.
-                for (final section in GameSection.values) ...[
-                  _SectionButton(section: section),
-                  const SizedBox(height: 20),
-                ],
-              ],
+                    // GameSection.values enum'un tüm değerlerini verir.
+                    // Yeni bir bölüm eklersek bu ekran kendiliğinden günceller;
+                    // burada elle liste tutmuyoruz.
+                    for (final section in GameSection.values) ...[
+                      _SectionButton(section: section),
+                      const SizedBox(height: 20),
+                    ],
+                  ],
+                ),
+              ),
             ),
-          ),
+            // Ayarlar: ebeveyn için, köşede ve küçük.
+            Positioned(
+              top: 4,
+              right: 4,
+              child: IconButton(
+                icon: const Icon(Icons.settings_rounded),
+                iconSize: 30,
+                color: renk.textMuted,
+                tooltip: 'Ayarlar',
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SettingsPage()),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -69,27 +96,24 @@ class _TurkceSesUyarisi extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final renk = AppColors.of(context);
     return Container(
-      width: 320,
+      width: 300, // sağ üstteki ayar simgesiyle çakışmasın
       // SIKI tutuluyor: bant uzunken "Nesneler" butonu ekranın altına
       // taşıyordu ve çocuğun kaydırması gerekiyordu (emülatörde görüldü).
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.fromLTRB(16, 12, 8, 4),
       decoration: BoxDecoration(
-        color: AppColors.warningSurface,
+        color: renk.warningSurface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.warning, width: 2),
+        border: Border.all(color: renk.warning, width: 2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(
-                Icons.volume_off_rounded,
-                color: AppColors.warning,
-                size: 30,
-              ),
+              Icon(Icons.volume_off_rounded, color: renk.warning, size: 30),
               SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -97,17 +121,17 @@ class _TurkceSesUyarisi extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.warning,
+                    color: renk.warning,
                   ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 6),
-          const Text(
+          Text(
             'Sorular sesli okunmuyor. Ayarlar\'da "Metin okuma" bölümünden '
             'Google motorunu seçip Türkçe sesi indirin.',
-            style: TextStyle(fontSize: 15, color: Colors.black87),
+            style: TextStyle(fontSize: 15, color: renk.text),
           ),
           Align(
             alignment: Alignment.centerRight,
@@ -117,7 +141,7 @@ class _TurkceSesUyarisi extends StatelessWidget {
               onPressed: () => context.read<GameProvider>().sesiKontrolEt(),
               icon: const Icon(Icons.refresh_rounded),
               label: const Text('Tekrar kontrol et'),
-              style: TextButton.styleFrom(foregroundColor: AppColors.warning),
+              style: TextButton.styleFrom(foregroundColor: renk.warning),
             ),
           ),
         ],
@@ -134,6 +158,7 @@ class _SectionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final renk = AppColors.of(context);
     return SizedBox(
       width: 300,
       height: 110,
@@ -147,8 +172,8 @@ class _SectionButton extends StatelessWidget {
           );
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: AppColors.primaryDark,
+          backgroundColor: renk.surface,
+          foregroundColor: renk.primaryDark,
           elevation: 4,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(28),

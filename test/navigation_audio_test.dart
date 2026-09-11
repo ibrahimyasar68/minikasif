@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
+import 'package:mini_kesif/main.dart';
 import 'package:mini_kesif/models/game_section.dart';
-import 'package:mini_kesif/pages/home_page.dart';
 import 'package:mini_kesif/providers/game_provider.dart';
 import 'package:mini_kesif/services/audio_service.dart';
 
@@ -10,9 +9,9 @@ import 'helpers/oyun.dart';
 
 /// Ekranlar arası geçişte ses davranışı.
 ///
-/// Neden MiniKesifApp değil de ağacı elle kuruyoruz?
-/// MiniKesifApp gerçek TtsAudioService kullanıyor. Ne söylendiğini ve
-/// sesin durdurulup durdurulmadığını görmek için sahte servis lazım.
+/// Sahte ses servisiyle gerçek uygulamayı (MiniKesifApp) açıyoruz: ne
+/// söylendiğini ve sesin durdurulup durdurulmadığını görebiliyoruz. Gerçek
+/// bağlantı (ayar sarmalayıcısı dahil) da böylece sınanmış oluyor.
 class FakeAudio implements AudioService {
   final spoken = <String>[];
   int stops = 0;
@@ -32,12 +31,7 @@ void main() {
 
   Future<void> uygulamayiKur(WidgetTester tester) async {
     audio = FakeAudio();
-    await tester.pumpWidget(
-      ChangeNotifierProvider(
-        create: (_) => GameProvider(audio: audio),
-        child: const MaterialApp(home: HomePage()),
-      ),
-    );
+    await tester.pumpWidget(MiniKesifApp(audio: audio));
     await bolumeGir(tester, GameSection.fruits);
   }
 

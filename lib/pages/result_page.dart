@@ -53,6 +53,7 @@ class _ResultPageState extends State<ResultPage> {
   Widget build(BuildContext context) {
     final game = context.watch<GameProvider>();
     final sonrakiBolum = game.section.next;
+    final renk = AppColors.of(context);
 
     // PopScope hem sistem geri tuşunu hem de "Ana sayfa" butonunun
     // popUntil'ini yakalar: ikisinde de kutlama sesi kesilmeli.
@@ -61,10 +62,10 @@ class _ResultPageState extends State<ResultPage> {
         if (didPop) context.read<GameProvider>().leave();
       },
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: renk.background,
         appBar: AppBar(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          backgroundColor: renk.primary,
+          foregroundColor: renk.onPrimary,
           title: Text(game.section.title),
           automaticallyImplyLeading: false,
         ),
@@ -79,12 +80,12 @@ class _ResultPageState extends State<ResultPage> {
                 children: [
                   const Text('🎉', style: TextStyle(fontSize: 88)),
                   const SizedBox(height: 12),
-                  const Text(
+                  Text(
                     'Tebrikler!',
                     style: TextStyle(
                       fontSize: 40,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.success,
+                      color: renk.success,
                     ),
                   ),
 
@@ -100,7 +101,7 @@ class _ResultPageState extends State<ResultPage> {
                         Icon(
                           i < game.starCount ? Icons.star : Icons.star_border,
                           size: 56,
-                          color: AppColors.star,
+                          color: renk.star,
                         ),
                     ],
                   ),
@@ -113,7 +114,7 @@ class _ResultPageState extends State<ResultPage> {
                     '${game.totalQuestions} sorudan ${game.firstTryCount} tanesini '
                     'ilk denemede bildin',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 18, color: Colors.black54),
+                    style: TextStyle(fontSize: 18, color: renk.textMuted),
                   ),
 
                   const SizedBox(height: 36),
@@ -121,7 +122,7 @@ class _ResultPageState extends State<ResultPage> {
                   _SonucButonu(
                     etiket: 'Tekrar oyna',
                     emoji: '🔁',
-                    renk: AppColors.primary,
+                    renk: renk.primary,
                     onTap: () {
                       context.read<GameProvider>().restart();
                       _oyunaGit();
@@ -135,7 +136,7 @@ class _ResultPageState extends State<ResultPage> {
                     _SonucButonu(
                       etiket: sonrakiBolum.title,
                       emoji: sonrakiBolum.emoji,
-                      renk: AppColors.successLight,
+                      renk: renk.successLight,
                       onTap: () {
                         context.read<GameProvider>().startSection(sonrakiBolum);
                         _oyunaGit();
@@ -148,7 +149,7 @@ class _ResultPageState extends State<ResultPage> {
                   _SonucButonu(
                     etiket: 'Ana sayfa',
                     emoji: '🏠',
-                    renk: AppColors.neutral,
+                    renk: renk.neutral,
                     // popUntil: ilk sayfaya kadar tüm sayfaları kapatır.
                     onTap: () =>
                         Navigator.popUntil(context, (route) => route.isFirst),
@@ -187,7 +188,7 @@ class _SonucButonu extends StatelessWidget {
         onPressed: onTap,
         style: ElevatedButton.styleFrom(
           backgroundColor: renk,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.of(context).onPrimary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
           ),

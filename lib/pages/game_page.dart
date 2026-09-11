@@ -3,6 +3,7 @@ import '../theme/app_colors.dart';
 import 'package:provider/provider.dart';
 import '../models/answer_option.dart';
 import '../providers/game_provider.dart';
+import '../providers/settings_provider.dart';
 import '../widgets/answer_card.dart';
 import '../widgets/answer_grid.dart';
 import 'result_page.dart';
@@ -70,6 +71,7 @@ class _GamePageState extends State<GamePage> {
   @override
   Widget build(BuildContext context) {
     final game = context.watch<GameProvider>();
+    final renk = AppColors.of(context);
 
     // PopScope: bu sayfadan GERİ çıkılınca haber verir.
     //
@@ -83,10 +85,10 @@ class _GamePageState extends State<GamePage> {
         if (didPop) _game.leave();
       },
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: renk.background,
         appBar: AppBar(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          backgroundColor: renk.primary,
+          foregroundColor: renk.onPrimary,
           title: Text('Soru ${game.questionNumber} / ${game.totalQuestions}'),
         ),
         body: SafeArea(
@@ -141,7 +143,9 @@ class _QuestionView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final game = context.watch<GameProvider>();
+    final renk = AppColors.of(context);
     final question = game.currentQuestion;
+    final sesAcik = context.select<SettingsProvider, bool>((a) => a.sesAcik);
 
     // AnimatedSwitcher: child'ın KEY'i değişince eskiyi soldurup
     // yeniyi belirtir. Anahtar soru id'si olduğu için:
@@ -157,10 +161,10 @@ class _QuestionView extends StatelessWidget {
           Text(
             question.questionText,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: AppColors.primaryDark,
+              color: renk.primaryDark,
             ),
           ),
 
@@ -171,12 +175,12 @@ class _QuestionView extends StatelessWidget {
           // Okuma yazma gerektirmeyen tek erişim yolu bu.
           // Türkçe ses yoksa bu buton hiçbir şey yapmaz; hiç göstermiyoruz.
           // İşe yaramayan bir buton çocuğun kafasını karıştırır.
-          if (game.turkceSesVar != false)
+          if (sesAcik && game.turkceSesVar != false)
             IconButton(
               onPressed: () => context.read<GameProvider>().repeatQuestion(),
               icon: const Icon(Icons.volume_up_rounded),
               iconSize: 48,
-              color: AppColors.primary,
+              color: renk.primary,
               tooltip: 'Tekrar dinle',
             ),
 
@@ -199,7 +203,7 @@ class _QuestionView extends StatelessWidget {
             style: TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.bold,
-              color: game.isAnswered ? AppColors.success : Colors.black54,
+              color: game.isAnswered ? renk.success : renk.textMuted,
             ),
           ),
         ],

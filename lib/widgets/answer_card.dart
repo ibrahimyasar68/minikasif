@@ -44,14 +44,15 @@ class AnswerCard extends StatelessWidget {
   /// switch ifadesi enum'un TÜM değerlerini kapsamak zorunda,
   /// yoksa Dart derleme hatası verir. Yeni bir durum eklersek
   /// burayı güncellemeyi unutamayız.
-  Color get _backgroundColor => switch (status) {
-    AnswerStatus.normal => Colors.white,
-    AnswerStatus.correct => AppColors.successSurface, // yumuşak yeşil
-    AnswerStatus.wrong => AppColors.wrongSurface, // soluk gri
+  Color _arkaPlan(AppColors renk) => switch (status) {
+    AnswerStatus.normal => renk.surface,
+    AnswerStatus.correct => renk.successSurface, // yumuşak yeşil
+    AnswerStatus.wrong => renk.wrongSurface, // soluk
   };
 
   @override
   Widget build(BuildContext context) {
+    final renk = AppColors.of(context);
     // Yanlış kart soluklaşsın ama KAYBOLMASIN.
     // Çocuğu cezalandırmıyoruz, sadece "bu değil" diyoruz (CLAUDE.md md.18).
     final opacity = status == AnswerStatus.wrong ? 0.45 : 1.0;
@@ -89,7 +90,7 @@ class AnswerCard extends StatelessWidget {
             width: size,
             height: size,
             child: Material(
-              color: _backgroundColor,
+              color: _arkaPlan(renk),
               borderRadius: BorderRadius.circular(24),
               elevation: isCorrect ? 8 : 3,
               // Material renk ve yükseklik değişimini kendisi animasyonlar.
@@ -120,9 +121,9 @@ class AnswerCard extends StatelessWidget {
                               const SizedBox(height: 8),
                               Text(
                                 option.label,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 20,
-                                  color: Colors.black54,
+                                  color: renk.textMuted,
                                 ),
                               ),
                             ],
@@ -133,12 +134,12 @@ class AnswerCard extends StatelessWidget {
                     // Doğru kartın köşesinde onay rozeti.
                     // Stack çocukları üst üste bindirir; Positioned yerini belirler.
                     if (status == AnswerStatus.correct)
-                      const Positioned(
+                      Positioned(
                         top: 8,
                         right: 8,
                         child: Icon(
                           Icons.check_circle,
-                          color: AppColors.success,
+                          color: renk.success,
                           size: 32,
                         ),
                       ),

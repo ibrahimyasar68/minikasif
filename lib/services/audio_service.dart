@@ -213,3 +213,27 @@ class TtsAudioService implements AudioService {
     } catch (_) {}
   }
 }
+
+/// Ses ayarına uyan sarmalayıcı.
+///
+/// Neden ayrı bir sınıf? GameProvider ses ayarını bilmek zorunda kalmasın.
+/// Oyun her zaman "konuş" der; ayar kapalıysa bu katman sessizce yutar.
+/// Asıl servis (TTS) de ayardan habersiz kalır. Her parça tek iş yapıyor.
+///
+/// [acikMi] her konuşmada yeniden sorulur: ayar değişince hemen etkili.
+class ToggleableAudioService implements AudioService {
+  ToggleableAudioService(this._ic, {required this.acikMi});
+
+  final AudioService _ic;
+  final bool Function() acikMi;
+
+  @override
+  Future<void> speak(String text) =>
+      acikMi() ? _ic.speak(text) : Future<void>.value();
+
+  @override
+  Future<void> stop() => _ic.stop();
+
+  @override
+  Future<bool> hazirla({bool yeniden = false}) => _ic.hazirla(yeniden: yeniden);
+}
