@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 import 'package:provider/provider.dart';
 import '../models/answer_option.dart';
 import '../providers/game_provider.dart';
 import '../widgets/answer_card.dart';
+import '../widgets/answer_grid.dart';
 import 'result_page.dart';
 
 /// Oyun ekranı. Kendi state'i yok; her şeyi GameProvider'dan okur.
@@ -14,24 +16,31 @@ class GamePage extends StatelessWidget {
     final game = context.watch<GameProvider>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF3E0),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFF9800),
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         title: Text('Soru ${game.questionNumber} / ${game.totalQuestions}'),
       ),
       body: SafeArea(
-        // Center ŞART.
+        // Küçük ekranda veya büyük yazı tipi ayarında içerik sığmayabilir.
+        // Taşma yerine kaydırma istiyoruz.
         //
-        // Scaffold gövdeye GEVŞEK genişlik kısıtı verir (minWidth=0).
-        // Bu durumda Column en geniş çocuğu kadar büzülür ve sol kenara
-        // yapışır; içerik ekranda sola kaymış görünür.
-        // Center, büzülen Column'u yatayda ortalar.
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: const _QuestionView(),
-          ),
+        // Kalıp şu: SingleChildScrollView içeriği serbest bırakır,
+        // ConstrainedBox ise "en az ekran kadar uzun ol" der.
+        // Böylece içerik kısaysa Center ortalar, uzunsa kaydırılır.
+        child: LayoutBuilder(
+          builder: (context, kisit) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: kisit.maxHeight - 40),
+                // Center yatay ortalama için de şart
+                // (bkz. test/layout_test.dart).
+                child: const Center(child: _QuestionView()),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -83,7 +92,7 @@ class _QuestionView extends StatelessWidget {
             style: const TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: Color(0xFFE65100),
+              color: AppColors.primaryDark,
             ),
           ),
 
@@ -96,26 +105,18 @@ class _QuestionView extends StatelessWidget {
             onPressed: () => context.read<GameProvider>().repeatQuestion(),
             icon: const Icon(Icons.volume_up_rounded),
             iconSize: 48,
-            color: const Color(0xFFFF9800),
+            color: AppColors.primary,
             tooltip: 'Tekrar dinle',
           ),
 
           const SizedBox(height: 20),
 
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            alignment: WrapAlignment.center,
-            children: [
-              for (final option in question.options)
-                AnswerCard(
-                  option: option,
-                  status: _statusFor(game, option),
-                  onTap: game.isAnswered
-                      ? null
-                      : () => context.read<GameProvider>().answer(option),
-                ),
-            ],
+          AnswerGrid(
+            options: question.options,
+            statusOf: (option) => _statusFor(game, option),
+            onTap: game.isAnswered
+                ? null
+                : (option) => context.read<GameProvider>().answer(option),
           ),
 
           const SizedBox(height: 32),
@@ -125,7 +126,7 @@ class _QuestionView extends StatelessWidget {
             style: TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.bold,
-              color: game.isAnswered ? const Color(0xFF2E7D32) : Colors.black54,
+              color: game.isAnswered ? AppColors.success : Colors.black54,
             ),
           ),
 
@@ -181,7 +182,7 @@ class _QuestionView extends StatelessWidget {
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF43A047),
+                          backgroundColor: AppColors.successLight,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(24),

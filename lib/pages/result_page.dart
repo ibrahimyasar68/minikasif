@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
 import 'game_page.dart';
@@ -54,9 +55,9 @@ class _ResultPageState extends State<ResultPage> {
     final sonrakiBolum = game.section.next;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF3E0),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFF9800),
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         title: Text(game.section.title),
         automaticallyImplyLeading: false,
@@ -77,7 +78,7 @@ class _ResultPageState extends State<ResultPage> {
                   style: TextStyle(
                     fontSize: 40,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF2E7D32),
+                    color: AppColors.success,
                   ),
                 ),
 
@@ -93,7 +94,7 @@ class _ResultPageState extends State<ResultPage> {
                       Icon(
                         i < game.starCount ? Icons.star : Icons.star_border,
                         size: 56,
-                        color: const Color(0xFFFFB300),
+                        color: AppColors.star,
                       ),
                   ],
                 ),
@@ -114,7 +115,7 @@ class _ResultPageState extends State<ResultPage> {
                 _SonucButonu(
                   etiket: 'Tekrar oyna',
                   emoji: '🔁',
-                  renk: const Color(0xFFFF9800),
+                  renk: AppColors.primary,
                   onTap: () {
                     context.read<GameProvider>().restart();
                     _oyunaGit();
@@ -128,7 +129,7 @@ class _ResultPageState extends State<ResultPage> {
                   _SonucButonu(
                     etiket: sonrakiBolum.title,
                     emoji: sonrakiBolum.emoji,
-                    renk: const Color(0xFF43A047),
+                    renk: AppColors.successLight,
                     onTap: () {
                       context.read<GameProvider>().startSection(sonrakiBolum);
                       _oyunaGit();
@@ -141,7 +142,7 @@ class _ResultPageState extends State<ResultPage> {
                 _SonucButonu(
                   etiket: 'Ana sayfa',
                   emoji: '🏠',
-                  renk: const Color(0xFF8D6E63),
+                  renk: AppColors.neutral,
                   // popUntil: ilk sayfaya kadar tüm sayfaları kapatır.
                   onTap: () =>
                       Navigator.popUntil(context, (route) => route.isFirst),

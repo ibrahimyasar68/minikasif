@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 import 'package:provider/provider.dart';
 import '../models/game_section.dart';
 import '../providers/game_provider.dart';
@@ -11,7 +12,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF3E0),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -28,7 +29,7 @@ class HomePage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 44,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFFE65100),
+                    color: AppColors.primaryDark,
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -71,7 +72,7 @@ class _SectionButton extends StatelessWidget {
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.white,
-          foregroundColor: const Color(0xFFE65100),
+          foregroundColor: AppColors.primaryDark,
           elevation: 4,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(28),
