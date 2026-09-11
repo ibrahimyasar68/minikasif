@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mini_kesif/models/answer_option.dart';
+import 'package:mini_kesif/data/feedback_phrases.dart';
 import 'package:mini_kesif/models/game_section.dart';
 import 'package:mini_kesif/providers/game_provider.dart';
 import 'package:mini_kesif/services/audio_service.dart';
@@ -44,12 +46,13 @@ void main() {
 
   test('sonraki soruya geçince yeni soru okunur', () {
     game.startSection(GameSection.fruits);
-    audio.spoken.clear();
-
     final dogru = game.currentQuestion.options.firstWhere(
       (o) => game.currentQuestion.isCorrect(o),
     );
     game.answer(dogru);
+    // Cevabın kendi övgü sesi var; ondan SONRAKİ konuşmaya bakıyoruz.
+    audio.spoken.clear();
+
     game.nextQuestion();
 
     expect(audio.spoken, hasLength(1));
@@ -100,6 +103,8 @@ void main() {
     );
   });
 
+  // Yanlış cevapta kısa bir teşvik okunur ama SORU tekrar okunmaz:
+  // çocuk düşünürken sözünü kesmiyoruz.
   test('yanlış cevap soruyu tekrar okumaz', () {
     game.startSection(GameSection.fruits);
     audio.spoken.clear();
@@ -109,6 +114,81 @@ void main() {
     );
     game.answer(yanlis);
 
-    expect(audio.spoken, isEmpty, reason: 'çocuk düşünürken sözünü kesme');
+    expect(audio.spoken, hasLength(1));
+    expect(
+      audio.spoken.first,
+      isNot(game.currentQuestion.spokenText),
+      reason: 'çocuk düşünürken sözünü kesme',
+    );
+  });
+
+  group('sesli geri bildirim', () {
+    AnswerOption dogruSecenek() => game.currentQuestion.options.firstWhere(
+      (o) => game.currentQuestion.isCorrect(o),
+    );
+    AnswerOption yanlisSecenek() => game.currentQuestion.options.firstWhere(
+      (o) => !game.currentQuestion.isCorrect(o),
+    );
+
+    test('doğru cevapta nesnenin adı ve övgü okunur', () {
+      game.startSection(GameSection.fruits);
+      audio.spoken.clear();
+
+      final dogru = dogruSecenek();
+      game.answer(dogru);
+
+      expect(audio.spoken, ['${dogru.label}! ${praisePhrases.first}']);
+    });
+
+    test('yanlış cevapta dokunulan nesnenin adı ve teşvik okunur', () {
+      game.startSection(GameSection.fruits);
+      audio.spoken.clear();
+
+      final yanlis = yanlisSecenek();
+      game.answer(yanlis);
+
+      expect(audio.spoken, ['${yanlis.label}. ${retryPhrases.first}']);
+    });
+
+    // Hep aynı "Aferin!" birkaç sorudan sonra anlamını yitirir.
+    test('övgüler sırayla döner', () {
+      game.startSection(GameSection.fruits);
+      final ovguler = <String>[];
+      for (var i = 0; i < 3; i++) {
+        audio.spoken.clear();
+        final dogru = dogruSecenek();
+        game.answer(dogru);
+        ovguler.add(audio.spoken.single.substring(dogru.label.length + 2));
+        game.nextQuestion();
+      }
+      expect(ovguler, praisePhrases.take(3).toList());
+    });
+
+    test('teşvikler de döner: aynı cümle üst üste gelmez', () {
+      game.startSection(GameSection.fruits);
+      audio.spoken.clear();
+
+      // İlk soruda iki farklı yanlış seçenek var (Muz, Üzüm).
+      final yanlislar = game.currentQuestion.options
+          .where((o) => !game.currentQuestion.isCorrect(o))
+          .take(2);
+      for (final y in yanlislar) {
+        game.answer(y);
+      }
+
+      expect(audio.spoken, hasLength(2));
+      expect(audio.spoken[0].endsWith(retryPhrases[0]), isTrue);
+      expect(audio.spoken[1].endsWith(retryPhrases[1]), isTrue);
+    });
+
+    test('cevaplandıktan sonra dokunmak ses çıkarmaz', () {
+      game.startSection(GameSection.fruits);
+      game.answer(dogruSecenek());
+      audio.spoken.clear();
+
+      game.answer(yanlisSecenek());
+
+      expect(audio.spoken, isEmpty);
+    });
   });
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../data/feedback_phrases.dart';
 import '../data/question_data.dart';
 import '../models/answer_option.dart';
 import '../models/game_section.dart';
@@ -71,6 +72,11 @@ class GameProvider extends ChangeNotifier {
   bool _isCompleted = false;
   int _correctCount = 0;
   int _firstTryCount = 0;
+
+  /// Kaçıncı yanlış deneme olduğu. SKOR DEĞİL: sadece teşvik
+  /// cümlelerinin sırayla dönmesi için. Bölüm boyunca birikiyor ki
+  /// çocuk arka arkaya hep aynı cümleyi duymasın.
+  int _retryCount = 0;
   bool _isAnswered = false;
   final Set<String> _wrongOptionIds = {};
 
@@ -143,9 +149,28 @@ class GameProvider extends ChangeNotifier {
       if (_wrongOptionIds.isEmpty) _firstTryCount++;
     } else {
       _wrongOptionIds.add(option.id);
+      _retryCount++;
     }
 
     notifyListeners();
+    _speakFeedback(option);
+  }
+
+  /// Dokunulan seçenek için sesli geri bildirim.
+  ///
+  /// Nesnenin adı cümlenin BAŞINDA: "Elma! Aferin!", "Muz. Bir daha
+  /// deneyelim!". İki faydası var:
+  /// 1. Çocuk dokunduğu şeyin adını duyuyor - kelime öğretimi.
+  /// 2. Adı küçük harfe çevirmek gerekmiyor. Dart'ın toLowerCase()'i
+  ///    Türkçe bilmez: "İnek" -> "i̇nek" gibi bozuk sonuç verir.
+  ///
+  /// Yanlış cevapta SORUYU tekrar okumuyoruz (çocuk düşünürken sözünü
+  /// kesmemek için); sadece kısa, olumlu bir teşvik.
+  void _speakFeedback(AnswerOption option) {
+    final cumle = _isAnswered
+        ? '${option.label}! ${praisePhrases[(_correctCount - 1) % praisePhrases.length]}'
+        : '${option.label}. ${retryPhrases[(_retryCount - 1) % retryPhrases.length]}';
+    _audio.speak(cumle);
   }
 
   /// Sonraki soruya geç.
@@ -217,6 +242,7 @@ class GameProvider extends ChangeNotifier {
     _isCompleted = false;
     _correctCount = 0;
     _firstTryCount = 0;
+    _retryCount = 0;
     _clearQuestionState();
   }
 
