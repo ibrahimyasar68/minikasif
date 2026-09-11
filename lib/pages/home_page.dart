@@ -5,6 +5,7 @@ import '../models/game_section.dart';
 import '../providers/game_provider.dart';
 import '../providers/settings_provider.dart';
 import 'game_page.dart';
+import '../widgets/parent_gate_button.dart';
 import 'settings_page.dart';
 
 /// Karşılama + bölüm seçim ekranı.
@@ -65,16 +66,13 @@ class HomePage extends StatelessWidget {
                 ),
               ),
             ),
-            // Ayarlar: ebeveyn için, köşede ve küçük.
+            // Ayarlar: ebeveyn için, köşede. 2 saniye basılı tutarak açılır;
+            // çocuğun yanlışlıkla girmesini önler (ebeveyn kilidi).
             Positioned(
               top: 4,
               right: 4,
-              child: IconButton(
-                icon: const Icon(Icons.settings_rounded),
-                iconSize: 30,
-                color: renk.textMuted,
-                tooltip: 'Ayarlar',
-                onPressed: () => Navigator.push(
+              child: ParentGateButton(
+                onOpen: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const SettingsPage()),
                 ),

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mini_kesif/data/question_data.dart';
 import 'package:mini_kesif/models/game_section.dart';
@@ -37,6 +38,26 @@ Future<void> dokun(WidgetTester tester, Finder hedef) async {
 /// yetmez (geçiş ancak 4 sn'lik güvenlik sınırında olur).
 Future<void> otomatikGecisiBekle(WidgetTester tester) async {
   await tester.pump(GameProvider.minCelebration);
+  await tester.pumpAndSettle();
+}
+
+/// Ana sayfadaki ayar simgesini basılı tutarak Ayarlar'ı açar.
+///
+/// Ebeveyn kilidi: simge dokunmayla değil, basılı tutarak açılıyor.
+/// startGesture parmağı indirir; pump(süre) sahte saati ileri sarar
+/// (halka dolar); up() parmağı kaldırır.
+///
+/// DİKKAT: AnimationController saymaya forward() anında değil, SONRAKİ
+/// İLK KAREDE başlar. Önce pump() ile o kareyi çizmezsek pump(2 sn)'nin
+/// sonunda animasyon "şimdi başladım" sanır ve halka dolmaz.
+Future<void> ayarlariAc(WidgetTester tester) async {
+  final parmak = await tester.startGesture(
+    tester.getCenter(find.byIcon(Icons.settings_rounded)),
+  );
+  await tester.pump(); // animasyonun ilk karesi
+  await tester.pump(const Duration(seconds: 2));
+  await tester.pump(const Duration(milliseconds: 50));
+  await parmak.up();
   await tester.pumpAndSettle();
 }
 

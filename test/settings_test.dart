@@ -22,11 +22,6 @@ class KayitSes implements AudioService {
 }
 
 void main() {
-  Future<void> ayarlariAc(WidgetTester tester) async {
-    await tester.tap(find.byTooltip('Ayarlar'));
-    await tester.pumpAndSettle();
-  }
-
   Future<void> geriDon(WidgetTester tester) async {
     await tester.pageBack();
     await tester.pumpAndSettle();
