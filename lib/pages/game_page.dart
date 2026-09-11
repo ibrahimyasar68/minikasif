@@ -25,12 +25,20 @@ class GamePage extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          // Oyun bittiyse tamamen farklı bir ekran gösteriyoruz.
-          child: game.isCompleted
-              ? const _CompletedView()
-              : const _QuestionView(),
+        // Center ŞART.
+        //
+        // Scaffold gövdeye GEVŞEK genişlik kısıtı verir (minWidth=0).
+        // Bu durumda Column en geniş çocuğu kadar büzülür ve sol kenara
+        // yapışır; içerik ekranda sola kaymış görünür.
+        // Center, büzülen Column'u yatayda ortalar.
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            // Oyun bittiyse tamamen farklı bir ekran gösteriyoruz.
+            child: game.isCompleted
+                ? const _CompletedView()
+                : const _QuestionView(),
+          ),
         ),
       ),
     );
