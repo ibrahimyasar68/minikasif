@@ -27,8 +27,19 @@ void main() {
     correctOptionId: 'top',
   );
 
-  GameProvider tekSoruluOyun() => GameProvider(questions: [soru1]);
-  GameProvider ikiSoruluOyun() => GameProvider(questions: [soru1, soru2]);
+  GameProvider tekSoruluOyun() {
+    final oyun = GameProvider(questions: [soru1]);
+    // Doğru cevap bir Timer başlatıyor; test bitince kapat.
+    addTearDown(oyun.dispose);
+    return oyun;
+  }
+
+  GameProvider ikiSoruluOyun() {
+    final oyun = GameProvider(questions: [soru1, soru2]);
+    // Doğru cevap bir Timer başlatıyor; test bitince kapat.
+    addTearDown(oyun.dispose);
+    return oyun;
+  }
 
   group('cevaplama', () {
     test('başlangıçta cevaplanmamış ve yanlış denemesi yok', () {

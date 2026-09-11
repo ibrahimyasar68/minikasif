@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mini_kesif/main.dart';
+import 'package:mini_kesif/services/audio_service.dart';
 
 /// Ekran okuyucu (TalkBack) testleri.
 ///
@@ -8,7 +9,7 @@ import 'package:mini_kesif/main.dart';
 /// var ama ekran okuyucuya anlamlı bir şey söylemeyebilir.
 void main() {
   Future<void> bolumeGir(WidgetTester tester) async {
-    await tester.pumpWidget(const MiniKesifApp());
+    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
     await tester.tap(find.text('Meyveler'));
     await tester.pumpAndSettle();
   }

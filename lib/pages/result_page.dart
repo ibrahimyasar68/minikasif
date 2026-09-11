@@ -58,7 +58,7 @@ class _ResultPageState extends State<ResultPage> {
     // popUntil'ini yakalar: ikisinde de kutlama sesi kesilmeli.
     return PopScope(
       onPopInvokedWithResult: (didPop, _) {
-        if (didPop) context.read<GameProvider>().stopAudio();
+        if (didPop) context.read<GameProvider>().leave();
       },
       child: Scaffold(
         backgroundColor: AppColors.background,

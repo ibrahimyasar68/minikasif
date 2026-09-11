@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mini_kesif/data/question_data.dart';
 import 'package:mini_kesif/main.dart';
+import 'package:mini_kesif/services/audio_service.dart';
 import 'package:mini_kesif/models/game_section.dart';
 import 'package:mini_kesif/widgets/answer_card.dart';
 
@@ -34,7 +35,7 @@ void main() {
   testWidgets('Küçük telefonda soru ekranı taşmıyor', (tester) async {
     // 320x480 dp - çok küçük ama gerçek bir cihaz sınıfı.
     ekran(tester, const Size(960, 1440), dpr: 3.0);
-    await tester.pumpWidget(const MiniKesifApp());
+    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
     await bolumeGir(tester, GameSection.fruits);
 
     expect(tester.takeException(), isNull);
@@ -43,7 +44,7 @@ void main() {
 
   testWidgets('Ana sayfa küçük telefonda taşmıyor', (tester) async {
     ekran(tester, const Size(960, 1440), dpr: 3.0);
-    await tester.pumpWidget(const MiniKesifApp());
+    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
@@ -55,7 +56,7 @@ void main() {
     tester,
   ) async {
     ekran(tester, const Size(960, 1440), dpr: 3.0);
-    await tester.pumpWidget(const MiniKesifApp());
+    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
 
     for (final bolum in GameSection.values) {
       await bolumeGir(tester, bolum);
@@ -83,7 +84,7 @@ void main() {
     tester.view.padding = const FakeViewPadding(top: 63, bottom: 63);
     final sinir = (2400 - 63) / 2.625; // alt çubuğun üst kenarı
 
-    await tester.pumpWidget(const MiniKesifApp());
+    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
     await tester.pumpAndSettle();
 
     for (final bolum in GameSection.values) {
@@ -103,15 +104,14 @@ void main() {
             reason: '${soru.id}: kart kaydırmadan görünmeli',
           );
         }
-        final buton = find.textContaining(RegExp('Devam|Bitir'));
+        // Buton yok artık; geri bildirim metni de kaydırmadan görünmeli.
         expect(
-          tester.getRect(buton).bottom,
+          tester.getRect(find.text('Aferin! 🎉')).bottom,
           lessThan(sinir),
-          reason: '${soru.id}: buton kaydırmadan görünmeli',
+          reason: '${soru.id}: geri bildirim kaydırmadan görünmeli',
         );
 
-        await tester.tap(buton);
-        await tester.pumpAndSettle();
+        await otomatikGecisiBekle(tester);
       }
       await dokun(tester, find.text('Ana sayfa'));
     }
@@ -124,7 +124,7 @@ void main() {
     tester.platformDispatcher.textScaleFactorTestValue = 2.0;
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
 
-    await tester.pumpWidget(const MiniKesifApp());
+    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull, reason: 'ana sayfa');
 

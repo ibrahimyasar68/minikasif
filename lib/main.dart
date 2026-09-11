@@ -9,7 +9,16 @@ void main() {
 }
 
 class MiniKesifApp extends StatelessWidget {
-  const MiniKesifApp({super.key});
+  const MiniKesifApp({super.key, this.audio});
+
+  /// Ses servisi. Verilmezse gerçek TTS kullanılır (uygulamanın kendisi).
+  ///
+  /// Neden dışarıdan verilebiliyor? Testler için.
+  /// Test ortamında TTS eklentisinin "konuşma bitti" haberi hiç gelmez;
+  /// otomatik geçiş her seferinde 4 saniyelik güvenlik sınırına düşer.
+  /// Testler buraya SilentAudioService geçerek gerçek eklentiye hiç
+  /// dokunmuyor - AudioService arayüzünün var olma sebebi tam olarak bu.
+  final AudioService? audio;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +34,7 @@ class MiniKesifApp extends StatelessWidget {
       // GERÇEK ses servisi SADECE burada bağlanıyor.
       // Uygulamanın geri kalanı sadece AudioService arayüzünü tanıyor.
       // Yarın TTS yerine .mp3 kullanmak istersek değişecek tek yer burası.
-      create: (context) => GameProvider(audio: TtsAudioService()),
+      create: (context) => GameProvider(audio: audio ?? TtsAudioService()),
       child: MaterialApp(
         title: 'MiniKesif',
         debugShowCheckedModeBanner: false,

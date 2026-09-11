@@ -51,6 +51,10 @@ class TtsAudioService implements AudioService {
     // Hafif tiz: çocuklara daha sıcak geliyor.
     await _tts.setPitch(1.1);
     await _tts.setVolume(1.0);
+    // speak() konuşma BİTİNCE tamamlansın. Varsayılanda hemen döner.
+    // Otomatik geçiş övgünün bitmesini bu sayede bekleyebiliyor;
+    // yoksa yeni soru okunmaya başlayınca "Elma! Aferin!" yarıda kesilirdi.
+    await _tts.awaitSpeakCompletion(true);
     _isConfigured = true;
   }
 

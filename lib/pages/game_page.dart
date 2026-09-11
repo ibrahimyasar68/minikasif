@@ -7,9 +7,65 @@ import '../widgets/answer_card.dart';
 import '../widgets/answer_grid.dart';
 import 'result_page.dart';
 
-/// Oyun ekranı. Kendi state'i yok; her şeyi GameProvider'dan okur.
-class GamePage extends StatelessWidget {
+/// Oyun ekranı.
+///
+/// Neden StatefulWidget oldu?
+/// Ekranda gösterdiği her şeyi hâlâ GameProvider'dan okuyor; kendi OYUN
+/// durumu yok. Ama artık bir işi daha var: bölüm kendiliğinden
+/// (otomatik geçişle) bittiğinde sonuç sayfasını açmak. Bunun için
+/// provider'ı dinlemesi (addListener) ve sayfa kapanınca dinlemeyi
+/// bırakması (removeListener) gerekiyor. İkisi de State'in yaşam
+/// döngüsüne ait: initState ve dispose.
+class GamePage extends StatefulWidget {
   const GamePage({super.key});
+
+  @override
+  State<GamePage> createState() => _GamePageState();
+}
+
+class _GamePageState extends State<GamePage> {
+  late final GameProvider _game;
+
+  /// Sonuç sayfası bir kez açılsın.
+  bool _sonucaGecildi = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // context.read initState'te serbest; yasak olan build içinde çağırmak.
+    _game = context.read<GameProvider>();
+    _game.addListener(_bolumBittiyseSonucaGec);
+  }
+
+  @override
+  void dispose() {
+    // Dinleyiciyi kaldırmazsak sayfa kapandıktan sonra da çağrılmaya
+    // devam eder ve artık var olmayan bir context ile Navigator açmaya
+    // çalışır.
+    _game.removeListener(_bolumBittiyseSonucaGec);
+    super.dispose();
+  }
+
+  /// Bölüm bittiyse sonuç sayfasını açar.
+  ///
+  /// Neden build içinde değil?
+  /// build ekranı TARİF eder; sayfa açmak bir yan etkidir. build içinde
+  /// Navigator çağırmak "setState() or markNeedsBuild() called during
+  /// build" hatasına yol açar. Dinleyici ise build dışında, provider
+  /// notifyListeners() çağırdığında çalışır.
+  ///
+  /// mounted: bu State hâlâ ekrana bağlı mı? Kapanmış bir sayfanın
+  /// context'iyle Navigator kullanılamaz.
+  void _bolumBittiyseSonucaGec() {
+    if (!_game.isCompleted || _sonucaGecildi || !mounted) return;
+    _sonucaGecildi = true;
+
+    // pushReplacement: geri tuşuyla bitmiş soruya dönülmesin.
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const ResultPage()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,11 +76,11 @@ class GamePage extends StatelessWidget {
     // Soru okunurken geri tuşuna basılırsa ses ana sayfada da
     // sürüyordu. Sayfa kapanırken sesi durduruyoruz.
     //
-    // context.read callback İÇİNDE: Provider, build sırasında
-    // read çağrılmasına izin vermez.
+    // leave() hem sesi durdurur hem de bekleyen otomatik geçişi
+    // iptal eder: sayfa kapandıktan sonra oyun arka planda ilerlemesin.
     return PopScope(
       onPopInvokedWithResult: (didPop, _) {
-        if (didPop) context.read<GameProvider>().stopAudio();
+        if (didPop) _game.leave();
       },
       child: Scaffold(
         backgroundColor: AppColors.background,
@@ -133,83 +189,14 @@ class _QuestionView extends StatelessWidget {
 
           const SizedBox(height: 32),
 
+          // Doğru cevaptan sonra buton YOK: övgü bitince sonraki soruya
+          // kendiliğinden geçiliyor (GameProvider._scheduleAdvance).
           Text(
             _feedbackText(game),
             style: TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.bold,
               color: game.isAnswered ? AppColors.success : Colors.black54,
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // Devam butonu SADECE doğru cevaptan sonra görünür.
-          //
-          // Görünmez bir buton yerine hiç oluşturmuyoruz.
-          // SizedBox.shrink() = yer kaplamayan boş widget.
-          // Çocuk yanlış yerlere dokunup kazara ilerleyemesin.
-          //
-          // AnimatedSwitcher buton aniden belirmesin diye:
-          // yumuşak bir geçiş dikkati doğru yere çeker.
-          // Butona HER ZAMAN yer ayırıyoruz.
-          //
-          // İki faydası var:
-          // 1. Cevap verilince layout zıplamıyor.
-          // 2. Soru geçişinde eski ve yeni içerik aynı yükseklikte olduğu
-          //    için çapraz geçiş kayarak değil, düzgün soluyor.
-          SizedBox(
-            height: 80,
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 280),
-              child: game.isAnswered
-                  ? SizedBox(
-                      // ANAHTAR ŞART.
-                      // AnimatedSwitcher eski/yeni çocuğu runtimeType + key ile
-                      // karşılaştırır. İkisi de anahtarsız SizedBox olunca
-                      // Flutter onları AYNI widget sayıp geçişi atlıyordu.
-                      key: const ValueKey('devam-butonu'),
-                      width: 260,
-                      height: 80,
-                      child: ElevatedButton(
-                        // Son soruda bu buton bölümü bitirir ve sonuç
-                        // sayfasına geçer.
-                        //
-                        // Yönlendirme neden BURADA, build içinde değil?
-                        // build'in tek işi ekranı tarif etmektir; sayfa
-                        // açmak bir YAN ETKİdir ve build'e ait değildir.
-                        // Bir olayın (dokunma) içindeyiz, doğru yer burası.
-                        onPressed: () {
-                          final oyun = context.read<GameProvider>();
-                          oyun.nextQuestion();
-                          if (!oyun.isCompleted) return;
-
-                          // pushReplacement: geri tuşuyla bitmiş soruya
-                          // dönülmesin.
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ResultPage(),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.successLight,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                        ),
-                        child: Text(
-                          game.isLastQuestion ? 'Bitir 🏁' : 'Devam →',
-                          style: const TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    )
-                  : const SizedBox.shrink(key: ValueKey('buton-yok')),
             ),
           ),
         ],

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import '../data/feedback_phrases.dart';
 import '../data/question_data.dart';
@@ -80,6 +82,29 @@ class GameProvider extends ChangeNotifier {
   bool _isAnswered = false;
   final Set<String> _wrongOptionIds = {};
 
+  // --- Otomatik geçiş ---
+
+  /// Doğru cevaptan sonra EN AZ bu kadar beklenir: çocuk yeşil kartı ve
+  /// ✅ işaretini görsün. Övgü daha uzun sürerse onun bitmesi beklenir.
+  static const minCelebration = Duration(milliseconds: 1200);
+
+  /// Ses motoru "bitti" haberini hiç vermezse EN FAZLA bu kadar beklenir.
+  /// Oyun asla donmamalı.
+  static const maxCelebration = Duration(seconds: 4);
+
+  Timer? _minTimer;
+  Timer? _maxTimer;
+  bool _minPassed = false;
+  bool _praiseDone = false;
+
+  /// Her beklemenin numarası. Bekleme iptal edilince artar.
+  ///
+  /// Neden gerekli? Timer'lar iptal edilebilir ama bir Future (övgü sesi)
+  /// iptal edilemez. İptal edilmiş eski bir beklemenin övgüsü sonradan
+  /// bitince haber gelir; numara uyuşmazsa o haber yok sayılır.
+  int _advanceToken = 0;
+  bool _disposed = false;
+
   // --- Okuma ---
 
   /// Şu an sorulan soru.
@@ -153,7 +178,8 @@ class GameProvider extends ChangeNotifier {
     }
 
     notifyListeners();
-    _speakFeedback(option);
+    final konusma = _speakFeedback(option);
+    if (_isAnswered) _scheduleAdvance(konusma);
   }
 
   /// Dokunulan seçenek için sesli geri bildirim.
@@ -166,17 +192,70 @@ class GameProvider extends ChangeNotifier {
   ///
   /// Yanlış cevapta SORUYU tekrar okumuyoruz (çocuk düşünürken sözünü
   /// kesmemek için); sadece kısa, olumlu bir teşvik.
-  void _speakFeedback(AnswerOption option) {
+  Future<void> _speakFeedback(AnswerOption option) {
     final cumle = _isAnswered
         ? '${option.label}! ${praisePhrases[(_correctCount - 1) % praisePhrases.length]}'
         : '${option.label}. ${retryPhrases[(_retryCount - 1) % retryPhrases.length]}';
-    _audio.speak(cumle);
+    return _audio.speak(cumle);
+  }
+
+  /// Doğru cevaptan sonra sonraki soruya geçişi planlar.
+  ///
+  /// Kural: övgü bitene kadar bekle, ama en az [minCelebration],
+  /// en fazla [maxCelebration]. Sabit bir süre iki yönden de yanlış olurdu:
+  /// kısaysa "Elma! Aferin!" yarıda kesilir (yeni soru okunmaya başlayınca
+  /// önceki konuşma durur), uzunsa çocuk boşuna bekler.
+  void _scheduleAdvance(Future<void> ovgu) {
+    _cancelPendingAdvance();
+    final token = _advanceToken;
+
+    _minTimer = Timer(minCelebration, () {
+      _minPassed = true;
+      _tryAdvance(token);
+    });
+    _maxTimer = Timer(maxCelebration, () {
+      _minPassed = true;
+      _praiseDone = true;
+      _tryAdvance(token);
+    });
+
+    // Övgü hata verse de "bitti" sayıyoruz: oyun takılmamalı.
+    ovgu.catchError((_) {}).whenComplete(() {
+      if (token != _advanceToken) return; // iptal edilmiş eski bekleme
+      _praiseDone = true;
+      _tryAdvance(token);
+    });
+  }
+
+  void _tryAdvance(int token) {
+    if (_disposed || token != _advanceToken) return;
+    if (!_minPassed || !_praiseDone) return;
+    nextQuestion();
+  }
+
+  /// Bekleyen otomatik geçişi iptal eder.
+  void _cancelPendingAdvance() {
+    _advanceToken++;
+    _minTimer?.cancel();
+    _maxTimer?.cancel();
+    _minTimer = null;
+    _maxTimer = null;
+    _minPassed = false;
+    _praiseDone = false;
   }
 
   /// Sonraki soruya geç.
+  ///
+  /// Normalde otomatik geçiş çağırır; testler ve ileride eklenebilecek
+  /// bir "geç" butonu da doğrudan çağırabilir.
   void nextQuestion() {
-    // Cevaplanmamış sorudan atlanamaz.
-    if (!_isAnswered) return;
+    // Cevaplanmamış sorudan atlanamaz; bitmiş bölüm ikinci kez bitmez.
+    if (!_isAnswered || _isCompleted) return;
+
+    // Elle geçildiyse bekleyen otomatik geçiş İKİNCİ bir geçiş yapmasın.
+    // Özellikle son soruda: "bölüm bitti" iki kez tetiklenir ve ikincisi
+    // sonuç ekranındaki kutlama sesini keserdi.
+    _cancelPendingAdvance();
 
     if (isLastQuestion) {
       _isCompleted = true;
@@ -213,12 +292,21 @@ class GameProvider extends ChangeNotifier {
     _audio.speak(mesaj);
   }
 
-  /// Devam eden okumayı durdurur.
+  /// Oyun veya sonuç sayfasından ayrılırken çağrılır.
   ///
-  /// Sayfadan çıkılınca çağrılır: çocuk soru okunurken geri tuşuna
-  /// basarsa ses ana sayfada devam etmemeli.
+  /// İki iş yapar:
+  /// 1. Sesi durdurur: çocuk soru okunurken geri tuşuna basarsa ses ana
+  ///    sayfada devam etmemeli.
+  /// 2. Bekleyen otomatik geçişi iptal eder: sayfa kapandıktan sonra oyun
+  ///    arka planda kendi kendine ilerlememeli.
+  ///
+  /// (Eski adı stopAudio'ydu. Artık sesten fazlasını yaptığı için adı
+  /// değişti; eski ad yanıltıcı olurdu.)
   /// notifyListeners YOK: ekranda değişen bir durum yok.
-  void stopAudio() => _audio.stop();
+  void leave() {
+    _cancelPendingAdvance();
+    _audio.stop();
+  }
 
   /// Soruyu tekrar okur. Çocuk kaçırırsa 🔊 butonuyla tetiklenir.
   void repeatQuestion() => _speakCurrentQuestion();
@@ -252,7 +340,17 @@ class GameProvider extends ChangeNotifier {
   /// aynı işi yapıyor. Tek yerde tutunca birini güncelleyip
   /// diğerini unutma riski kalmıyor.
   void _clearQuestionState() {
+    _cancelPendingAdvance();
     _isAnswered = false;
     _wrongOptionIds.clear();
+  }
+
+  /// Provider kapatılırken bekleyen Timer'lar da kapatılmalı.
+  /// Yoksa kapanmış bir provider'da notifyListeners çağrılır ve hata verir.
+  @override
+  void dispose() {
+    _disposed = true;
+    _cancelPendingAdvance();
+    super.dispose();
   }
 }

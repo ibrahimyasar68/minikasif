@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mini_kesif/data/question_data.dart';
 import 'package:mini_kesif/main.dart';
+import 'package:mini_kesif/services/audio_service.dart';
 import 'package:mini_kesif/models/game_section.dart';
 
 import 'helpers/oyun.dart';
@@ -9,7 +10,7 @@ import 'helpers/oyun.dart';
 void main() {
   /// Uygulamayı açar, bölüme girer ve sonuna kadar doğru oynar.
   Future<void> bolumuBitir(WidgetTester tester, GameSection bolum) async {
-    await tester.pumpWidget(const MiniKesifApp());
+    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
     await bolumeGir(tester, bolum);
     await bolumuOyna(tester, bolum);
   }

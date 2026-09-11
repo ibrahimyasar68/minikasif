@@ -78,4 +78,27 @@ void main() {
       reason: 'kutlama sesi ana sayfada sürmemeli',
     );
   });
+
+  // Doğru cevaptan sonra otomatik geçiş beklenirken geri tuşuna basılırsa
+  // oyun arka planda kendi kendine ilerlememeli.
+  // Zincir: PopScope -> leave() -> bekleyen geçiş iptal.
+  testWidgets('Beklerken geri dönülürse oyun arka planda ilerlemez', (
+    tester,
+  ) async {
+    await uygulamayiKur(tester);
+    final oyun = Provider.of<GameProvider>(
+      tester.element(find.text('Kırmızı elmayı bul')),
+      listen: false,
+    );
+
+    await tester.tap(find.text('Elma'));
+    await tester.pump(); // cevap işlendi, otomatik geçiş beklemesi başladı
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    await tester.pump(GameProvider.maxCelebration * 2);
+
+    expect(oyun.questionNumber, 1, reason: 'arka planda soru ilerlememeli');
+    expect(oyun.isCompleted, isFalse);
+  });
 }

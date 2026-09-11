@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mini_kesif/data/question_data.dart';
 import 'package:mini_kesif/main.dart';
+import 'package:mini_kesif/services/audio_service.dart';
 import 'package:mini_kesif/models/game_section.dart';
+import 'package:mini_kesif/providers/game_provider.dart';
 import 'package:mini_kesif/widgets/answer_card.dart';
 
 import 'helpers/oyun.dart';
@@ -14,7 +16,7 @@ void main() {
   final n = sorular.length;
 
   Future<void> bolumuAc(WidgetTester tester) async {
-    await tester.pumpWidget(const MiniKesifApp());
+    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
     await bolumeGir(tester, bolum);
   }
 
@@ -61,15 +63,33 @@ void main() {
       expect(find.text('Tekrar dene 🙂'), findsNothing);
     });
 
-    testWidgets('Devam butonu cevap verilmeden görünmez', (tester) async {
+    testWidgets('Doğru cevaptan sonra kendiliğinden sonraki soruya geçilir', (
+      tester,
+    ) async {
       await bolumuAc(tester);
-      expect(find.text('Devam →'), findsNothing);
-
-      await dokun(tester, find.text('Muz'));
-      expect(find.text('Devam →'), findsNothing, reason: 'yanlışta ilerleme');
-
       await dokun(tester, find.text('Elma'));
-      expect(find.text('Devam →'), findsOneWidget);
+      expect(
+        find.text('Soru 1 / $n'),
+        findsOneWidget,
+        reason: 'hemen değil: önce yeşil kart ve övgü',
+      );
+
+      await otomatikGecisiBekle(tester);
+
+      expect(find.text('Soru 2 / $n'), findsOneWidget);
+      expect(find.text(sorular[1].questionText), findsOneWidget);
+    });
+
+    testWidgets('Yanlış cevapta geçilmez; Devam butonu artık yok', (
+      tester,
+    ) async {
+      await bolumuAc(tester);
+      await dokun(tester, find.text('Muz'));
+      await tester.pump(GameProvider.maxCelebration * 2);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Soru 1 / $n'), findsOneWidget);
+      expect(find.byType(ElevatedButton), findsNothing);
     });
   });
 
@@ -83,11 +103,9 @@ void main() {
         expect(find.text(soru.questionText), findsOneWidget);
 
         await dokun(tester, find.text(dogruEtiket(soru)));
-
-        // Son soruda buton metni değişir.
-        final buton = i == n - 1 ? 'Bitir 🏁' : 'Devam →';
-        expect(find.text(buton), findsOneWidget, reason: soru.id);
-        await dokun(tester, find.text(buton));
+        // Buton yok: övgüden sonra kendiliğinden geçiliyor. Son soruda
+        // sonuç sayfası da kendiliğinden açılıyor.
+        await otomatikGecisiBekle(tester);
       }
 
       expect(find.text('Tebrikler!'), findsOneWidget);
@@ -100,7 +118,7 @@ void main() {
 
       await dokun(tester, find.text('Muz')); // 1. soruda yanlış
       await dokun(tester, find.text('Elma'));
-      await dokun(tester, find.text('Devam →'));
+      await otomatikGecisiBekle(tester);
 
       // 2. soruda Muz doğru cevap; soluk değil normal görünmeli.
       final muzKarti = tester.widget<AnswerCard>(
@@ -153,7 +171,7 @@ void main() {
 
   group('bölümler', () {
     testWidgets('Hayvanlar bölümü kendi sorularını gösterir', (tester) async {
-      await tester.pumpWidget(const MiniKesifApp());
+      await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
       await bolumeGir(tester, GameSection.animals);
 
       expect(find.text('Kediyi bul'), findsOneWidget);
@@ -164,7 +182,7 @@ void main() {
     testWidgets('Bölüm değişince ilerleme sıfırlanır', (tester) async {
       await bolumuAc(tester);
       await dokun(tester, find.text('Elma'));
-      await dokun(tester, find.text('Devam →'));
+      await otomatikGecisiBekle(tester);
       expect(find.text('Soru 2 / $n'), findsOneWidget);
 
       await tester.pageBack();

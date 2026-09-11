@@ -29,6 +29,10 @@ void main() {
     game = GameProvider(audio: audio);
   });
 
+  // Doğru cevap artık bir Timer başlatıyor (otomatik geçiş).
+  // Test bitince provider'ı kapatıp Timer'ları da kapatıyoruz.
+  tearDown(() => game.dispose());
+
   test('bölüm başlayınca ilk soru okunur', () {
     game.startSection(GameSection.animals);
 

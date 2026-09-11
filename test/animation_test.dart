@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mini_kesif/main.dart';
+import 'package:mini_kesif/services/audio_service.dart';
+import 'package:mini_kesif/providers/game_provider.dart';
 
 /// Animasyon testleri.
 ///
@@ -9,7 +11,7 @@ import 'package:mini_kesif/main.dart';
 /// gidip o andaki duruma bakıyoruz.
 void main() {
   Future<void> bolumuAc(WidgetTester tester) async {
-    await tester.pumpWidget(const MiniKesifApp());
+    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
     await tester.tap(find.text('Meyveler'));
     await tester.pumpAndSettle();
   }
@@ -61,7 +63,10 @@ void main() {
     await tester.tap(find.text('Elma'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Devam →'));
+    // Buton yok: otomatik geçişin gerçekleşmesi için yeterince bekle.
+    // pump(süre) saati ileri sarar ve SONUNDA tek bir kare çizer; geçiş
+    // animasyonu o karede başlar.
+    await tester.pump(GameProvider.maxCelebration);
     // Geçişin ortası: 320ms'lik animasyonun ~yarısı.
     await tester.pump(const Duration(milliseconds: 150));
 
@@ -90,34 +95,5 @@ void main() {
       findsOneWidget,
       reason: 'soru metni kopyalanmamalı',
     );
-  });
-
-  testWidgets('Devam butonu solarak belirir, aniden değil', (tester) async {
-    await bolumuAc(tester);
-    await tester.tap(find.text('Elma'));
-
-    // İlk pump animasyonu BAŞLATIR (t=0). Zamanı ilerletmek için
-    // ikinci bir pump gerekiyor.
-    await tester.pump();
-    // 280ms'lik geçişin ortası.
-    await tester.pump(const Duration(milliseconds: 140));
-
-    // Butona EN YAKIN FadeTransition'ı alıyoruz.
-    // .first şart: soru geçişinin FadeTransition'ı da bir üst ata.
-    final fade = tester.widget<FadeTransition>(
-      find
-          .ancestor(
-            of: find.text('Devam →'),
-            matching: find.byType(FadeTransition),
-          )
-          .first,
-    );
-
-    // Yarı yolda: ne tamamen görünmez ne tamamen görünür.
-    expect(fade.opacity.value, greaterThan(0.0));
-    expect(fade.opacity.value, lessThan(1.0));
-
-    await tester.pumpAndSettle();
-    expect(find.text('Devam →'), findsOneWidget);
   });
 }

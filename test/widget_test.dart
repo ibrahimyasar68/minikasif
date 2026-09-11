@@ -1,10 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mini_kesif/main.dart';
+import 'package:mini_kesif/services/audio_service.dart';
 import 'package:mini_kesif/models/game_section.dart';
 
 void main() {
   testWidgets('Karşılama ekranında başlık ve 3 bölüm görünür', (tester) async {
-    await tester.pumpWidget(const MiniKesifApp());
+    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
 
     expect(find.text('Mini Keşif'), findsOneWidget);
 
