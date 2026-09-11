@@ -84,4 +84,31 @@ void main() {
       expect((e.widget as AnswerCard).onTap, isNull);
     }
   });
+
+  // Tablet gibi geniş ekranda Wrap 4 kartı tek sıraya dizmemeli:
+  // "4 seçenek -> 2x2" kuralı her genişlikte geçerli olmalı.
+  testWidgets('geniş ekranda da 4 seçenek 2x2', (tester) async {
+    tester.view.physicalSize = const Size(2400, 2400);
+    tester.view.devicePixelRatio = 2.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 1100,
+              child: AnswerGrid(
+                options: secenekler(4),
+                statusOf: (_) => AnswerStatus.normal,
+                onTap: (_) {},
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(satirSayisi(tester), 2);
+  });
 }

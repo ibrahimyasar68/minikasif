@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mini_kesif/data/question_data.dart';
 import 'package:mini_kesif/main.dart';
+import 'package:mini_kesif/models/game_section.dart';
 import 'package:mini_kesif/widgets/answer_card.dart';
+
+import 'helpers/oyun.dart';
 
 /// Farklı ekran ve yazı boyutlarında taşma olmamalı.
 ///
@@ -14,16 +18,24 @@ void main() {
     addTearDown(tester.view.reset);
   }
 
-  Future<void> bolumeGir(WidgetTester tester, String bolum) async {
-    await tester.pumpWidget(const MiniKesifApp());
-    await tester.tap(find.text(bolum));
-    await tester.pumpAndSettle();
+  double genislik(WidgetTester t) =>
+      t.view.physicalSize.width / t.view.devicePixelRatio;
+
+  /// Ekrandaki tüm kartlar yatayda ekrana sığıyor mu?
+  void kartlarSigiyor(WidgetTester tester, String neden) {
+    final w = genislik(tester);
+    for (final e in find.byType(AnswerCard).evaluate()) {
+      final r = tester.getRect(find.byWidget(e.widget));
+      expect(r.left, greaterThanOrEqualTo(0.0), reason: neden);
+      expect(r.right, lessThanOrEqualTo(w), reason: neden);
+    }
   }
 
   testWidgets('Küçük telefonda soru ekranı taşmıyor', (tester) async {
     // 320x480 dp - çok küçük ama gerçek bir cihaz sınıfı.
     ekran(tester, const Size(960, 1440), dpr: 3.0);
-    await bolumeGir(tester, 'Meyveler');
+    await tester.pumpWidget(const MiniKesifApp());
+    await bolumeGir(tester, GameSection.fruits);
 
     expect(tester.takeException(), isNull);
     expect(find.byType(AnswerCard), findsNWidgets(3));
@@ -37,57 +49,72 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Sonuç ekranı küçük telefonda taşmıyor', (tester) async {
+  // 30 sorunun HEPSİ (2, 3 ve 4 seçenekli) ve üç sonuç ekranı
+  // küçük telefonda denenir.
+  testWidgets('Küçük telefonda hiçbir soru ve sonuç ekranı taşmıyor', (
+    tester,
+  ) async {
     ekran(tester, const Size(960, 1440), dpr: 3.0);
-    await bolumeGir(tester, 'Meyveler');
-    for (final d in ['Elma', 'Muz', 'Portakal', 'Çilek']) {
-      await tester.ensureVisible(find.text(d));
-      await tester.tap(find.text(d));
-      await tester.pumpAndSettle();
-      // Bu kadar küçük ekranda buton ekranın altında kalıyor;
-      // kaydırma gerekiyor. Normal telefonda gerekmediğini
-      // aşağıdaki test doğruluyor.
-      await tester.ensureVisible(find.textContaining(RegExp('Devam|Bitir')));
-      await tester.pumpAndSettle();
-      await tester.tap(find.textContaining(RegExp('Devam|Bitir')));
-      await tester.pumpAndSettle();
-    }
+    await tester.pumpWidget(const MiniKesifApp());
 
-    expect(tester.takeException(), isNull);
-    expect(find.text('Tebrikler!'), findsOneWidget);
-  });
-
-  testWidgets('Kartlar mevcut genişliğe sığar', (tester) async {
-    ekran(tester, const Size(960, 1440), dpr: 3.0);
-    await bolumeGir(tester, 'Meyveler');
-
-    final ekranGenislik =
-        tester.view.physicalSize.width / tester.view.devicePixelRatio;
-    for (final e in find.byType(AnswerCard).evaluate()) {
-      final r = tester.getRect(find.byWidget(e.widget));
-      expect(r.left, greaterThanOrEqualTo(0.0));
-      expect(r.right, lessThanOrEqualTo(ekranGenislik));
+    for (final bolum in GameSection.values) {
+      await bolumeGir(tester, bolum);
+      await bolumuOyna(
+        tester,
+        bolum,
+        sorudaIken: (soru) async {
+          expect(tester.takeException(), isNull, reason: soru.id);
+          kartlarSigiyor(tester, soru.id);
+        },
+      );
+      expect(tester.takeException(), isNull, reason: '${bolum.title} sonuç');
+      expect(find.text('Tebrikler!'), findsOneWidget);
+      await dokun(tester, find.text('Ana sayfa'));
     }
   });
 
-  // Hedef cihazda kaydırma GEREKMEMELİ: çocuğun devam etmek için
-  // ekranı kaydırması beklenmemeli.
-  testWidgets('Normal telefonda her şey kaydırmadan görünür', (tester) async {
-    ekran(tester, const Size(1080, 2400));
-    await bolumeGir(tester, 'Meyveler');
+  // Hedef cihazda HİÇBİR soruda kaydırma gerekmemeli: çocuğun devam
+  // etmek için ekranı kaydırması beklenmemeli.
+  testWidgets('Hedef telefonda hiçbir soru kaydırma gerektirmiyor', (
+    tester,
+  ) async {
+    ekran(tester, const Size(1080, 2400)); // Pixel 6
+    // Gerçek cihazdaki durum çubuğu ve alt hareket çubuğu (~24 dp).
+    tester.view.padding = const FakeViewPadding(top: 63, bottom: 63);
+    final sinir = (2400 - 63) / 2.625; // alt çubuğun üst kenarı
 
-    final ekranYukseklik =
-        tester.view.physicalSize.height / tester.view.devicePixelRatio;
-
-    await tester.tap(find.text('Elma'));
+    await tester.pumpWidget(const MiniKesifApp());
     await tester.pumpAndSettle();
 
-    final buton = tester.getRect(find.text('Devam →'));
-    expect(
-      buton.bottom,
-      lessThan(ekranYukseklik),
-      reason: 'Devam butonu kaydırmadan görünmeli',
-    );
+    for (final bolum in GameSection.values) {
+      await tester.tap(find.text(bolum.title));
+      await tester.pumpAndSettle();
+
+      for (final soru in questionsOf(bolum)) {
+        // DİKKAT: burada ensureVisible KULLANMIYORUZ. Kaydırma gerekirse
+        // ensureVisible bunu sessizce yapar ve sorunu gizlerdi.
+        await tester.tap(find.text(dogruEtiket(soru)));
+        await tester.pumpAndSettle();
+
+        for (final e in find.byType(AnswerCard).evaluate()) {
+          expect(
+            tester.getRect(find.byWidget(e.widget)).bottom,
+            lessThan(sinir),
+            reason: '${soru.id}: kart kaydırmadan görünmeli',
+          );
+        }
+        final buton = find.textContaining(RegExp('Devam|Bitir'));
+        expect(
+          tester.getRect(buton).bottom,
+          lessThan(sinir),
+          reason: '${soru.id}: buton kaydırmadan görünmeli',
+        );
+
+        await tester.tap(buton);
+        await tester.pumpAndSettle();
+      }
+      await dokun(tester, find.text('Ana sayfa'));
+    }
     expect(tester.takeException(), isNull);
   });
 

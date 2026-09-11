@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mini_kesif/main.dart';
+import 'package:mini_kesif/models/game_section.dart';
 import 'package:mini_kesif/widgets/answer_card.dart';
+
+import 'helpers/oyun.dart';
 
 /// Yatay ortalama testleri.
 ///
@@ -37,32 +40,33 @@ void main() {
     return (sol + sag) / 2;
   }
 
-  testWidgets('Soru ekranındaki kartlar yatayda ortalı', (tester) async {
+  // 2, 3 ve 4 seçenekli düzenlerin HEPSİ ortalı olmalı.
+  testWidgets('Her soruda kartlar yatayda ortalı', (tester) async {
     ekranAyarla(tester);
     await tester.pumpWidget(const MiniKesifApp());
-    await tester.tap(find.text('Meyveler'));
-    await tester.pumpAndSettle();
 
-    expect(
-      grupMerkezi(tester, find.byType(AnswerCard)),
-      moreOrLessEquals(ekranMerkezi(tester), epsilon: 1.0),
-      reason: 'kart grubu ekran merkezinde olmalı',
-    );
+    for (final bolum in GameSection.values) {
+      await bolumeGir(tester, bolum);
+      await bolumuOyna(
+        tester,
+        bolum,
+        sorudaIken: (soru) async {
+          expect(
+            grupMerkezi(tester, find.byType(AnswerCard)),
+            moreOrLessEquals(ekranMerkezi(tester), epsilon: 1.0),
+            reason: '${soru.id}: kart grubu ekran merkezinde olmalı',
+          );
+        },
+      );
+      await dokun(tester, find.text('Ana sayfa'));
+    }
   });
 
   testWidgets('Tebrik ekranındaki içerik yatayda ortalı', (tester) async {
     ekranAyarla(tester);
     await tester.pumpWidget(const MiniKesifApp());
-    await tester.tap(find.text('Meyveler'));
-    await tester.pumpAndSettle();
-
-    // Bölümü bitir.
-    for (final dogru in ['Elma', 'Muz', 'Portakal', 'Çilek']) {
-      await tester.tap(find.text(dogru));
-      await tester.pumpAndSettle();
-      await tester.tap(find.textContaining(RegExp('Devam|Bitir')));
-      await tester.pumpAndSettle();
-    }
+    await bolumeGir(tester, GameSection.fruits);
+    await bolumuOyna(tester, GameSection.fruits);
 
     // Yıldız satırı dar bir içerik: Column büzülürse en net buradan belli olur.
     expect(

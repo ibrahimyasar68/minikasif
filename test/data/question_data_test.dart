@@ -76,4 +76,42 @@ void main() {
       }
     });
   });
+
+  group('MVP kapsamı', () {
+    // CLAUDE.md md.3: "3 bölüm, toplam 30 soru".
+    test('toplam 30 soru var', () {
+      expect(allQuestions.length, 30);
+    });
+
+    test('her bölümde 10 soru var', () {
+      for (final s in GameSection.values) {
+        expect(questionsOf(s).length, 10, reason: s.title);
+      }
+    });
+
+    // Karışık zorluk: 2, 3 ve 4 seçenekli soruların hepsi bulunmalı.
+    test('2, 3 ve 4 seçenekli soruların hepsi var', () {
+      final sayilar = allQuestions.map((q) => q.options.length).toSet();
+      expect(sayilar, containsAll([2, 3, 4]));
+    });
+
+    // Çocuk okuyamıyor; seçenekleri SADECE görselden ayırt ediyor.
+    // Aynı emoji bir soruda iki kez olursa soru çözülemez.
+    test('bir soru içinde emojiler benzersiz', () {
+      for (final q in allQuestions) {
+        final emojiler = q.options.map((o) => o.emoji).toList();
+        expect(emojiler.toSet().length, emojiler.length, reason: q.id);
+      }
+    });
+
+    // Testler seçeneği etiketiyle buluyor (find.text). Aynı etiketten
+    // iki tane olursa hangisine dokunulacağı belirsizleşir; ekran
+    // okuyucu da ikisini aynı okur.
+    test('bir soru içinde etiketler benzersiz', () {
+      for (final q in allQuestions) {
+        final etiketler = q.options.map((o) => o.label).toList();
+        expect(etiketler.toSet().length, etiketler.length, reason: q.id);
+      }
+    });
+  });
 }

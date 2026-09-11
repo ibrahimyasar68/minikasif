@@ -57,19 +57,40 @@ class AnswerGrid extends StatelessWidget {
             .clamp(_enKucuk, _enBuyuk)
             .floorToDouble();
 
-        return Wrap(
-          spacing: _bosluk,
-          runSpacing: _bosluk,
-          alignment: WrapAlignment.center,
-          children: [
-            for (final option in options)
-              AnswerCard(
-                option: option,
-                size: boyut,
-                status: statusOf(option),
-                onTap: onTap == null ? null : () => onTap!(option),
-              ),
-          ],
+        // Genişliği sütun sayısına göre SABİTLİYORUZ.
+        //
+        // Wrap "sığdığı kadar yan yana koy" der. Geniş ekranda (tablet)
+        // 4 kart tek sıraya sığıyor ve "4 seçenek -> 2x2" kuralı
+        // bozuluyordu. Genişliği tam sutun kadar kart alacak şekilde
+        // verince her ekranda aynı düzen çıkıyor.
+        //
+        // Çok dar ekranda bu genişlik maxWidth'i aşarsa SizedBox otomatik
+        // olarak maxWidth'e kırpılır; Wrap o zaman alt satıra geçer.
+        // Center şart: üst widget SIKI genişlik kısıtı verirse (örn. sabit
+        // genişlikli bir kutu) SizedBox'ın genişliği yok sayılır ve zorla
+        // üst genişliğe büyütülür. "Kısıtlar yukarıdan aşağı iner": bir
+        // çocuk sıkı kısıttan küçük olamaz. Center çocuğuna GEVŞEK kısıt
+        // verir, böylece SizedBox istediği genişlikte kalabilir.
+        // heightFactor 1.0: yükseklik tam içerik kadar olsun, uzamasın.
+        return Center(
+          heightFactor: 1.0,
+          child: SizedBox(
+            width: sutun * boyut + (sutun - 1) * _bosluk,
+            child: Wrap(
+              spacing: _bosluk,
+              runSpacing: _bosluk,
+              alignment: WrapAlignment.center,
+              children: [
+                for (final option in options)
+                  AnswerCard(
+                    option: option,
+                    size: boyut,
+                    status: statusOf(option),
+                    onTap: onTap == null ? null : () => onTap!(option),
+                  ),
+              ],
+            ),
+          ),
         );
       },
     );

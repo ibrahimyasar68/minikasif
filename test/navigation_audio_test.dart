@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
+import 'package:mini_kesif/models/game_section.dart';
 import 'package:mini_kesif/pages/home_page.dart';
 import 'package:mini_kesif/providers/game_provider.dart';
 import 'package:mini_kesif/services/audio_service.dart';
+
+import 'helpers/oyun.dart';
 
 /// Ekranlar arası geçişte ses davranışı.
 ///
@@ -32,8 +35,7 @@ void main() {
         child: const MaterialApp(home: HomePage()),
       ),
     );
-    await tester.tap(find.text('Meyveler'));
-    await tester.pumpAndSettle();
+    await bolumeGir(tester, GameSection.fruits);
   }
 
   // Satır kapsamı raporunda 🔊 butonunun onPressed'i hiç çalışmamıştı.
@@ -64,19 +66,11 @@ void main() {
 
   testWidgets('Sonuç ekranından ana sayfaya dönünce ses durur', (tester) async {
     await uygulamayiKur(tester);
-    for (final d in ['Elma', 'Muz', 'Portakal', 'Çilek']) {
-      await tester.tap(find.text(d));
-      await tester.pumpAndSettle();
-      await tester.tap(find.textContaining(RegExp('Devam|Bitir')));
-      await tester.pumpAndSettle();
-    }
+    await bolumuOyna(tester, GameSection.fruits);
     // Bölüm bitince nextQuestion bir kez stop çağırıyor; onu sıfırla.
     audio.stops = 0;
 
-    await tester.ensureVisible(find.text('Ana sayfa'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Ana sayfa'));
-    await tester.pumpAndSettle();
+    await dokun(tester, find.text('Ana sayfa'));
 
     expect(
       audio.stops,

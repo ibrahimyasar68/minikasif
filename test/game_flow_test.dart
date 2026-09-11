@@ -1,48 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mini_kesif/data/question_data.dart';
 import 'package:mini_kesif/main.dart';
+import 'package:mini_kesif/models/game_section.dart';
 import 'package:mini_kesif/widgets/answer_card.dart';
 
-void main() {
-  // Meyveler bölümünün 4 sorusu, sırayla.
-  const dogrular = ['Elma', 'Muz', 'Portakal', 'Çilek'];
-  const yanlislar = ['Muz', 'Çilek', 'Üzüm', 'Muz'];
+import 'helpers/oyun.dart';
 
-  /// Uygulamayı açar ve Meyveler bölümüne girer.
+void main() {
+  const bolum = GameSection.fruits;
+  // Soru sayısını ve cevapları veriden okuyoruz; sabit yazmıyoruz.
+  final sorular = questionsOf(bolum);
+  final n = sorular.length;
+
   Future<void> bolumuAc(WidgetTester tester) async {
     await tester.pumpWidget(const MiniKesifApp());
-    await tester.tap(find.text('Meyveler'));
-    await tester.pumpAndSettle();
-  }
-
-  /// Bölümü sonuna kadar oynar.
-  /// [hataliSayisi] kadar soruda önce yanlış bir seçeneğe dokunur.
-  Future<void> bolumuBitir(WidgetTester tester, {int hataliSayisi = 0}) async {
-    for (var i = 0; i < dogrular.length; i++) {
-      if (i < hataliSayisi) {
-        await tester.tap(find.text(yanlislar[i]));
-        await tester.pumpAndSettle();
-      }
-      await tester.tap(find.text(dogrular[i]));
-      await tester.pumpAndSettle();
-      await tester.tap(find.textContaining(RegExp('Devam|Bitir')));
-      await tester.pumpAndSettle();
-    }
+    await bolumeGir(tester, bolum);
   }
 
   group('temel akış', () {
     testWidgets('Bölüme girince ilk soru görünür', (tester) async {
       await bolumuAc(tester);
 
-      expect(find.text('Soru 1 / 4'), findsOneWidget);
+      expect(find.text('Soru 1 / $n'), findsOneWidget);
       expect(find.text('Kırmızı elmayı bul'), findsOneWidget);
       expect(find.text('Bir seçeneğe dokun'), findsOneWidget);
     });
 
     testWidgets('Doğru cevap: Aferin mesajı ve onay rozeti', (tester) async {
       await bolumuAc(tester);
-      await tester.tap(find.text('Elma'));
-      await tester.pumpAndSettle();
+      await dokun(tester, find.text('Elma'));
 
       expect(find.text('Aferin! 🎉'), findsOneWidget);
       expect(find.byIcon(Icons.check_circle), findsOneWidget);
@@ -50,8 +37,7 @@ void main() {
 
     testWidgets('Yanlış cevap: nazik mesaj, oyun devam eder', (tester) async {
       await bolumuAc(tester);
-      await tester.tap(find.text('Muz'));
-      await tester.pumpAndSettle();
+      await dokun(tester, find.text('Muz'));
 
       expect(find.text('Tekrar dene 🙂'), findsOneWidget);
       expect(find.byIcon(Icons.check_circle), findsNothing);
@@ -59,22 +45,17 @@ void main() {
 
     testWidgets('Yanlıştan sonra doğruyu bulabilir', (tester) async {
       await bolumuAc(tester);
-      await tester.tap(find.text('Muz'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Üzüm'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Elma'));
-      await tester.pumpAndSettle();
+      await dokun(tester, find.text('Muz'));
+      await dokun(tester, find.text('Üzüm'));
+      await dokun(tester, find.text('Elma'));
 
       expect(find.text('Aferin! 🎉'), findsOneWidget);
     });
 
     testWidgets('Doğru cevaptan sonra kartlar kilitlenir', (tester) async {
       await bolumuAc(tester);
-      await tester.tap(find.text('Elma'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Muz'));
-      await tester.pumpAndSettle();
+      await dokun(tester, find.text('Elma'));
+      await dokun(tester, find.text('Muz'));
 
       expect(find.text('Aferin! 🎉'), findsOneWidget);
       expect(find.text('Tekrar dene 🙂'), findsNothing);
@@ -84,45 +65,31 @@ void main() {
       await bolumuAc(tester);
       expect(find.text('Devam →'), findsNothing);
 
-      await tester.tap(find.text('Muz'));
-      await tester.pumpAndSettle();
+      await dokun(tester, find.text('Muz'));
       expect(find.text('Devam →'), findsNothing, reason: 'yanlışta ilerleme');
 
-      await tester.tap(find.text('Elma'));
-      await tester.pumpAndSettle();
+      await dokun(tester, find.text('Elma'));
       expect(find.text('Devam →'), findsOneWidget);
     });
   });
 
   group('soru geçişi', () {
-    testWidgets('4 soru baştan sona oynanır', (tester) async {
+    testWidgets('Bölüm baştan sona oynanır', (tester) async {
       await bolumuAc(tester);
 
-      await tester.tap(find.text('Elma'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Devam →'));
-      await tester.pumpAndSettle();
+      for (var i = 0; i < n; i++) {
+        final soru = sorular[i];
+        expect(find.text('Soru ${i + 1} / $n'), findsOneWidget);
+        expect(find.text(soru.questionText), findsOneWidget);
 
-      expect(find.text('Soru 2 / 4'), findsOneWidget);
-      expect(find.text('Sarı muzu bul'), findsOneWidget);
+        await dokun(tester, find.text(dogruEtiket(soru)));
 
-      await tester.tap(find.text('Muz'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Devam →'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Portakal'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Devam →'));
-      await tester.pumpAndSettle();
+        // Son soruda buton metni değişir.
+        final buton = i == n - 1 ? 'Bitir 🏁' : 'Devam →';
+        expect(find.text(buton), findsOneWidget, reason: soru.id);
+        await dokun(tester, find.text(buton));
+      }
 
-      // Son soruda buton metni değişir.
-      expect(find.text('Soru 4 / 4'), findsOneWidget);
-      await tester.tap(find.text('Çilek'));
-      await tester.pumpAndSettle();
-      expect(find.text('Bitir 🏁'), findsOneWidget);
-
-      await tester.tap(find.text('Bitir 🏁'));
-      await tester.pumpAndSettle();
       expect(find.text('Tebrikler!'), findsOneWidget);
     });
 
@@ -131,12 +98,9 @@ void main() {
     ) async {
       await bolumuAc(tester);
 
-      await tester.tap(find.text('Muz')); // 1. soruda yanlış
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Elma'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Devam →'));
-      await tester.pumpAndSettle();
+      await dokun(tester, find.text('Muz')); // 1. soruda yanlış
+      await dokun(tester, find.text('Elma'));
+      await dokun(tester, find.text('Devam →'));
 
       // 2. soruda Muz doğru cevap; soluk değil normal görünmeli.
       final muzKarti = tester.widget<AnswerCard>(
@@ -149,15 +113,15 @@ void main() {
   group('yıldızlar', () {
     testWidgets('Hepsi ilk denemede: 3 dolu yıldız', (tester) async {
       await bolumuAc(tester);
-      await bolumuBitir(tester);
+      await bolumuOyna(tester, bolum);
 
       expect(find.byIcon(Icons.star), findsNWidgets(3));
       expect(find.byIcon(Icons.star_border), findsNothing);
     });
 
-    testWidgets('Yarısı ilk denemede: 2 dolu yıldız', (tester) async {
+    testWidgets('Yarısında hata: 2 dolu yıldız', (tester) async {
       await bolumuAc(tester);
-      await bolumuBitir(tester, hataliSayisi: 2); // 4 sorudan 2'si hatalı
+      await bolumuOyna(tester, bolum, hataliSoruSayisi: n ~/ 2);
 
       expect(find.byIcon(Icons.star), findsNWidgets(2));
       expect(find.byIcon(Icons.star_border), findsNWidgets(1));
@@ -167,7 +131,7 @@ void main() {
     // 1 yıldız alır - başarısız hissettirmiyoruz (CLAUDE.md md.18).
     testWidgets('Hepsinde hata: yine de 1 yıldız', (tester) async {
       await bolumuAc(tester);
-      await bolumuBitir(tester, hataliSayisi: 4);
+      await bolumuOyna(tester, bolum, hataliSoruSayisi: n);
 
       expect(find.byIcon(Icons.star), findsNWidgets(1));
       expect(find.byIcon(Icons.star_border), findsNWidgets(2));
@@ -175,10 +139,9 @@ void main() {
 
     testWidgets('Tekrar oynayınca skor sıfırlanır', (tester) async {
       await bolumuAc(tester);
-      await bolumuBitir(tester); // 3 yıldız
-      await tester.tap(find.text('Tekrar oyna'));
-      await tester.pumpAndSettle();
-      await bolumuBitir(tester, hataliSayisi: 4);
+      await bolumuOyna(tester, bolum); // 3 yıldız
+      await dokun(tester, find.text('Tekrar oyna'));
+      await bolumuOyna(tester, bolum, hataliSoruSayisi: n);
 
       expect(
         find.byIcon(Icons.star),
@@ -191,8 +154,7 @@ void main() {
   group('bölümler', () {
     testWidgets('Hayvanlar bölümü kendi sorularını gösterir', (tester) async {
       await tester.pumpWidget(const MiniKesifApp());
-      await tester.tap(find.text('Hayvanlar'));
-      await tester.pumpAndSettle();
+      await bolumeGir(tester, GameSection.animals);
 
       expect(find.text('Kediyi bul'), findsOneWidget);
       expect(find.text('Kırmızı elmayı bul'), findsNothing);
@@ -201,19 +163,16 @@ void main() {
     // Bir bölümü oynayıp geri dönünce başka bölüm temiz başlamalı.
     testWidgets('Bölüm değişince ilerleme sıfırlanır', (tester) async {
       await bolumuAc(tester);
-      await tester.tap(find.text('Elma'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Devam →'));
-      await tester.pumpAndSettle();
-      expect(find.text('Soru 2 / 4'), findsOneWidget);
+      await dokun(tester, find.text('Elma'));
+      await dokun(tester, find.text('Devam →'));
+      expect(find.text('Soru 2 / $n'), findsOneWidget);
 
-      // Geri dön, başka bölüme gir.
       await tester.pageBack();
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Nesneler'));
-      await tester.pumpAndSettle();
+      await bolumeGir(tester, GameSection.objects);
 
-      expect(find.text('Soru 1 / 4'), findsOneWidget);
+      final m = questionsOf(GameSection.objects).length;
+      expect(find.text('Soru 1 / $m'), findsOneWidget);
       expect(find.text('Topu bul'), findsOneWidget);
     });
   });

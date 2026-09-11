@@ -1,60 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mini_kesif/data/question_data.dart';
 import 'package:mini_kesif/main.dart';
 import 'package:mini_kesif/models/game_section.dart';
 
+import 'helpers/oyun.dart';
+
 void main() {
-  /// Verilen bölümü açıp sonuna kadar doğru oynar.
-  Future<void> bolumuBitir(
-    WidgetTester tester,
-    String bolumAdi,
-    List<String> dogrular,
-  ) async {
-    await tester.tap(find.text(bolumAdi));
-    await tester.pumpAndSettle();
-    for (final d in dogrular) {
-      await tester.tap(find.text(d));
-      await tester.pumpAndSettle();
-      await tester.tap(find.textContaining(RegExp('Devam|Bitir')));
-      await tester.pumpAndSettle();
-    }
+  /// Uygulamayı açar, bölüme girer ve sonuna kadar doğru oynar.
+  Future<void> bolumuBitir(WidgetTester tester, GameSection bolum) async {
+    await tester.pumpWidget(const MiniKesifApp());
+    await bolumeGir(tester, bolum);
+    await bolumuOyna(tester, bolum);
   }
 
-  Future<void> meyveleriBitir(WidgetTester tester) => bolumuBitir(
-    tester,
-    'Meyveler',
-    const ['Elma', 'Muz', 'Portakal', 'Çilek'],
-  );
-
   testWidgets('Bölüm bitince sonuç sayfası açılır', (tester) async {
-    await tester.pumpWidget(const MiniKesifApp());
-    await meyveleriBitir(tester);
+    await bolumuBitir(tester, GameSection.fruits);
+    final n = questionsOf(GameSection.fruits).length;
 
     expect(find.text('Tebrikler!'), findsOneWidget);
     expect(find.byIcon(Icons.star), findsNWidgets(3));
-    expect(find.textContaining('ilk denemede bildin'), findsOneWidget);
+    expect(
+      find.text('$n sorudan $n tanesini ilk denemede bildin'),
+      findsOneWidget,
+    );
 
     // Artık soru ekranında değiliz.
     expect(find.text('Kırmızı elmayı bul'), findsNothing);
   });
 
   testWidgets('Son bölüm değilse sonraki bölüm butonu görünür', (tester) async {
-    await tester.pumpWidget(const MiniKesifApp());
-    await meyveleriBitir(tester);
+    await bolumuBitir(tester, GameSection.fruits);
 
-    expect(find.text(GameSection.animals.title), findsOneWidget);
+    expect(
+      find.widgetWithText(ElevatedButton, GameSection.animals.title),
+      findsOneWidget,
+    );
     expect(find.text('Ana sayfa'), findsOneWidget);
   });
 
   // Son bölümde "sonraki" diye bir şey yok; buton hiç oluşturulmamalı.
   testWidgets('Son bölümde sonraki bölüm butonu yok', (tester) async {
-    await tester.pumpWidget(const MiniKesifApp());
-    await bolumuBitir(tester, 'Nesneler', const [
-      'Top',
-      'Araba',
-      'Balon',
-      'Kitap',
-    ]);
+    await bolumuBitir(tester, GameSection.objects);
 
     expect(find.text('Tebrikler!'), findsOneWidget);
 
@@ -71,37 +58,32 @@ void main() {
   });
 
   testWidgets('Sonraki bölüm butonu o bölümü başlatır', (tester) async {
-    await tester.pumpWidget(const MiniKesifApp());
-    await meyveleriBitir(tester);
+    await bolumuBitir(tester, GameSection.fruits);
 
-    await tester.tap(find.text(GameSection.animals.title));
-    await tester.pumpAndSettle();
+    await dokun(
+      tester,
+      find.widgetWithText(ElevatedButton, GameSection.animals.title),
+    );
 
-    expect(find.text('Soru 1 / 4'), findsOneWidget);
+    final m = questionsOf(GameSection.animals).length;
+    expect(find.text('Soru 1 / $m'), findsOneWidget);
     expect(find.text('Kediyi bul'), findsOneWidget);
   });
 
   testWidgets('Tekrar oyna aynı bölümü baştan başlatır', (tester) async {
-    await tester.pumpWidget(const MiniKesifApp());
-    await meyveleriBitir(tester);
+    await bolumuBitir(tester, GameSection.fruits);
 
-    await tester.tap(find.text('Tekrar oyna'));
-    await tester.pumpAndSettle();
+    await dokun(tester, find.text('Tekrar oyna'));
 
-    expect(find.text('Soru 1 / 4'), findsOneWidget);
+    final n = questionsOf(GameSection.fruits).length;
+    expect(find.text('Soru 1 / $n'), findsOneWidget);
     expect(find.text('Kırmızı elmayı bul'), findsOneWidget);
   });
 
   testWidgets('Ana sayfa butonu bölüm seçimine döner', (tester) async {
-    await tester.pumpWidget(const MiniKesifApp());
-    await meyveleriBitir(tester);
+    await bolumuBitir(tester, GameSection.fruits);
 
-    // Test penceresi (800x600) küçük; buton kaydırma alanının altında
-    // kalabiliyor. ensureVisible önce görünür hale getirir.
-    await tester.ensureVisible(find.text('Ana sayfa'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Ana sayfa'));
-    await tester.pumpAndSettle();
+    await dokun(tester, find.text('Ana sayfa'));
 
     expect(find.text('Mini Keşif'), findsOneWidget);
     for (final s in GameSection.values) {
@@ -112,8 +94,7 @@ void main() {
   // pushReplacement kullandık: sonuç sayfasından geri tuşu bitmiş
   // bir soruya dönmemeli.
   testWidgets('Sonuç sayfasında geri oku yok', (tester) async {
-    await tester.pumpWidget(const MiniKesifApp());
-    await meyveleriBitir(tester);
+    await bolumuBitir(tester, GameSection.fruits);
 
     expect(find.byType(BackButton), findsNothing);
   });
