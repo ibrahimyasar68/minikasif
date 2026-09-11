@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/answer_option.dart';
 import '../providers/game_provider.dart';
 import '../widgets/answer_card.dart';
+import 'result_page.dart';
 
 /// Oyun ekranı. Kendi state'i yok; her şeyi GameProvider'dan okur.
 class GamePage extends StatelessWidget {
@@ -17,12 +18,7 @@ class GamePage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFFFF9800),
         foregroundColor: Colors.white,
-        // Oyun bitince ilerleme yazmanın anlamı yok.
-        title: Text(
-          game.isCompleted
-              ? game.section.title
-              : 'Soru ${game.questionNumber} / ${game.totalQuestions}',
-        ),
+        title: Text('Soru ${game.questionNumber} / ${game.totalQuestions}'),
       ),
       body: SafeArea(
         // Center ŞART.
@@ -34,10 +30,7 @@ class GamePage extends StatelessWidget {
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(20),
-            // Oyun bittiyse tamamen farklı bir ekran gösteriyoruz.
-            child: game.isCompleted
-                ? const _CompletedView()
-                : const _QuestionView(),
+            child: const _QuestionView(),
           ),
         ),
       ),
@@ -166,8 +159,27 @@ class _QuestionView extends StatelessWidget {
                       width: 260,
                       height: 80,
                       child: ElevatedButton(
-                        onPressed: () =>
-                            context.read<GameProvider>().nextQuestion(),
+                        // Son soruda bu buton bölümü bitirir ve sonuç
+                        // sayfasına geçer.
+                        //
+                        // Yönlendirme neden BURADA, build içinde değil?
+                        // build'in tek işi ekranı tarif etmektir; sayfa
+                        // açmak bir YAN ETKİdir ve build'e ait değildir.
+                        // Bir olayın (dokunma) içindeyiz, doğru yer burası.
+                        onPressed: () {
+                          final oyun = context.read<GameProvider>();
+                          oyun.nextQuestion();
+                          if (!oyun.isCompleted) return;
+
+                          // pushReplacement: geri tuşuyla bitmiş soruya
+                          // dönülmesin.
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ResultPage(),
+                            ),
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF43A047),
                           foregroundColor: Colors.white,
@@ -189,72 +201,6 @@ class _QuestionView extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-/// Tüm sorular bitince görünen ekran.
-///
-/// GEÇİCİ: Sonuç ekranı (skor, doğru sayısı) ayrı bir sayfa olarak
-/// ilerideki aşamada gelecek. Şimdilik akışın kapandığını görelim.
-class _CompletedView extends StatelessWidget {
-  const _CompletedView();
-
-  @override
-  Widget build(BuildContext context) {
-    final game = context.watch<GameProvider>();
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Text('🎉', style: TextStyle(fontSize: 96)),
-        const SizedBox(height: 16),
-        const Text(
-          'Tebrikler!',
-          style: TextStyle(
-            fontSize: 40,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF2E7D32),
-          ),
-        ),
-        const SizedBox(height: 24),
-
-        // Skoru rakamla değil YILDIZLA gösteriyoruz.
-        // Hedef kitle okuyamıyor; "2/3" hiçbir şey ifade etmez.
-        // Dolu yıldız = ilk denemede bilinen soru.
-        Wrap(
-          spacing: 8,
-          alignment: WrapAlignment.center,
-          children: [
-            for (var i = 0; i < 3; i++)
-              Icon(
-                i < game.starCount ? Icons.star : Icons.star_border,
-                size: 52,
-                color: const Color(0xFFFFB300),
-              ),
-          ],
-        ),
-
-        const SizedBox(height: 40),
-        SizedBox(
-          width: 260,
-          height: 80,
-          child: ElevatedButton(
-            onPressed: () => context.read<GameProvider>().restart(),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF9800),
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
-              ),
-            ),
-            child: const Text(
-              'Tekrar oyna',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

@@ -71,8 +71,21 @@ void main() {
       reason: 'yıldızlar ekran merkezinde olmalı',
     );
 
+    // Butonun KENDİSİNİ ölçüyoruz, içindeki yazıyı değil.
+    // Buton içinde emoji solda + yazı sağda olduğu için yazının merkezi
+    // doğal olarak butonun merkezinden farklı.
     expect(
-      tester.getCenter(find.text('Tekrar oyna')).dx,
+      tester
+          .getRect(
+            find
+                .ancestor(
+                  of: find.text('Tekrar oyna'),
+                  matching: find.byType(ElevatedButton),
+                )
+                .first,
+          )
+          .center
+          .dx,
       moreOrLessEquals(ekranMerkezi(tester), epsilon: 1.0),
       reason: 'buton ekran merkezinde olmalı',
     );

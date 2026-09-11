@@ -20,4 +20,15 @@ enum GameSection {
 
   /// Bölümü temsil eden simge. Çocuk okuyamadığı için asıl ipucu bu.
   final String emoji;
+
+  /// Bir sonraki bölüm. Son bölümdeysek null.
+  ///
+  /// Neden burada?
+  /// "Bölümlerin sırası" bölümlerin kendi bilgisi. Sonuç ekranı bu sırayı
+  /// bilmek zorunda değil; sadece "sonraki var mı?" diye soruyor.
+  /// values enum'un tanımlanma sırasını verir.
+  GameSection? get next {
+    final i = values.indexOf(this);
+    return i + 1 < values.length ? values[i + 1] : null;
+  }
 }
