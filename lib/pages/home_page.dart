@@ -11,6 +11,14 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // context.select: provider'ın SADECE bu tek değerini dinle.
+    // context.watch tüm provider'ı dinlerdi. Oyun sırasında ana sayfa
+    // arkada (sayfa yığınında) duruyor; her notifyListeners() onu da
+    // boşuna yeniden çizerdi. select, değer değişmedikçe rebuild etmez.
+    final turkceSesVar = context.select<GameProvider, bool?>(
+      (oyun) => oyun.turkceSesVar,
+    );
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -22,6 +30,8 @@ class HomePage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // Sadece Türkçe ses KESİN yoksa (false). null = kontrol sürüyor.
+                if (turkceSesVar == false) const _TurkceSesUyarisi(),
                 const Text('🔍', style: TextStyle(fontSize: 80)),
                 const SizedBox(height: 8),
                 const Text(
@@ -45,6 +55,72 @@ class HomePage extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Türkçe ses motoru bulunamadığında ebeveyne gösterilen uyarı.
+///
+/// Bu bant ÇOCUK için değil, ebeveyn için: ne olduğunu ve ne yapması
+/// gerektiğini söylüyor. Kehribar renk: bir arıza değil, bir ayar eksik.
+class _TurkceSesUyarisi extends StatelessWidget {
+  const _TurkceSesUyarisi();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 320,
+      // SIKI tutuluyor: bant uzunken "Nesneler" butonu ekranın altına
+      // taşıyordu ve çocuğun kaydırması gerekiyordu (emülatörde görüldü).
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.fromLTRB(16, 12, 8, 4),
+      decoration: BoxDecoration(
+        color: AppColors.warningSurface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.warning, width: 2),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(
+                Icons.volume_off_rounded,
+                color: AppColors.warning,
+                size: 30,
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Türkçe ses bulunamadı',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.warning,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'Sorular sesli okunmuyor. Ayarlar\'da "Metin okuma" bölümünden '
+            'Google motorunu seçip Türkçe sesi indirin.',
+            style: TextStyle(fontSize: 15, color: Colors.black87),
+          ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              // Ses paketi yüklendikten sonra uygulamayı kapatmadan
+              // yeniden kontrol. Türkçe bulunursa bant kendiliğinden kalkar.
+              onPressed: () => context.read<GameProvider>().sesiKontrolEt(),
+              icon: const Icon(Icons.refresh_rounded),
+              label: const Text('Tekrar kontrol et'),
+              style: TextButton.styleFrom(foregroundColor: AppColors.warning),
+            ),
+          ),
+        ],
       ),
     );
   }

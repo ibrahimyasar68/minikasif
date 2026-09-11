@@ -34,7 +34,10 @@ class MiniKesifApp extends StatelessWidget {
       // GERÇEK ses servisi SADECE burada bağlanıyor.
       // Uygulamanın geri kalanı sadece AudioService arayüzünü tanıyor.
       // Yarın TTS yerine .mp3 kullanmak istersek değişecek tek yer burası.
-      create: (context) => GameProvider(audio: audio ?? TtsAudioService()),
+      // ..sesiKontrolEt(): açılışta ses motorunu hazırla ve Türkçe desteğini
+      // öğren. Sonucu beklemiyoruz; gelince provider haber veriyor.
+      create: (context) =>
+          GameProvider(audio: audio ?? TtsAudioService())..sesiKontrolEt(),
       child: MaterialApp(
         title: 'MiniKesif',
         debugShowCheckedModeBanner: false,

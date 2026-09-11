@@ -292,6 +292,27 @@ class GameProvider extends ChangeNotifier {
     _audio.speak(mesaj);
   }
 
+  // --- Ses hazırlığı ---
+
+  /// Cihazda Türkçe konuşabilen bir ses motoru var mı?
+  ///
+  /// null: kontrol henüz bitmedi. Uyarı SADECE false iken gösterilir;
+  /// böylece açılışta kontrol sürerken uyarı bir an görünüp kaybolmaz.
+  bool? _turkceSesVar;
+  bool? get turkceSesVar => _turkceSesVar;
+
+  /// Ses motorunu hazırlar ve Türkçe desteğini öğrenir.
+  ///
+  /// Uygulama açılırken bir kez çağrılır; ebeveyn "Tekrar kontrol et"e
+  /// basınca yeniden. Yan faydası: motor seçimi (1-2 sn) ilk sorudan
+  /// önce, açılışta yapılıyor; ilk soru gecikmeden okunuyor.
+  Future<void> sesiKontrolEt() async {
+    final sonuc = await _audio.hazirla(yeniden: _turkceSesVar != null);
+    if (_disposed) return;
+    _turkceSesVar = sonuc;
+    notifyListeners();
+  }
+
   /// Oyun veya sonuç sayfasından ayrılırken çağrılır.
   ///
   /// İki iş yapar:

@@ -18,6 +18,16 @@ class FakeAudioService implements AudioService {
 
   @override
   Future<void> stop() async => stopCount++;
+
+  /// hazirla() ne dönsün: cihazda Türkçe ses var mı?
+  bool turkceVar = true;
+  final hazirlaCagrilari = <bool>[]; // her çağrının "yeniden" değeri
+
+  @override
+  Future<bool> hazirla({bool yeniden = false}) async {
+    hazirlaCagrilari.add(yeniden);
+    return turkceVar;
+  }
 }
 
 void main() {
@@ -193,6 +203,40 @@ void main() {
       game.answer(yanlisSecenek());
 
       expect(audio.spoken, isEmpty);
+    });
+  });
+
+  group('Türkçe ses kontrolü', () {
+    test('açılışta kontrol bitene kadar bilinmiyor (null)', () {
+      expect(game.turkceSesVar, isNull);
+    });
+
+    test('Türkçe varsa true olur ve dinleyici uyarılır', () async {
+      var bildirim = 0;
+      game.addListener(() => bildirim++);
+
+      await game.sesiKontrolEt();
+
+      expect(game.turkceSesVar, isTrue);
+      expect(bildirim, 1);
+    });
+
+    test('Türkçe yoksa false olur', () async {
+      audio.turkceVar = false;
+      await game.sesiKontrolEt();
+      expect(game.turkceSesVar, isFalse);
+    });
+
+    // İlk kontrol normal, sonrakiler "yeniden": ebeveyn ses paketini
+    // yüklemiş olabilir, servis saklı sonucu atıp baştan bakmalı.
+    test('ikinci kontrol yeniden yapılır ve sonuç güncellenir', () async {
+      audio.turkceVar = false;
+      await game.sesiKontrolEt();
+      audio.turkceVar = true; // ebeveyn ses paketini yükledi
+      await game.sesiKontrolEt();
+
+      expect(audio.hazirlaCagrilari, [false, true]);
+      expect(game.turkceSesVar, isTrue);
     });
   });
 }

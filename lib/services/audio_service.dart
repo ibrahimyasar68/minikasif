@@ -20,6 +20,13 @@ abstract class AudioService {
 
   /// Devam eden okumayı durdurur.
   Future<void> stop();
+
+  /// Ses motorunu hazırlar; Türkçe konuşabiliyorsa true döner.
+  ///
+  /// Uygulama açılırken çağrılır. false ise ana ekranda ebeveyne uyarı
+  /// gösterilir ve speak() sessiz kalır (bozuk telaffuz yerine sessizlik).
+  /// [yeniden]: ebeveyn ses paketini yükledikten sonra tekrar kontrol et.
+  Future<bool> hazirla({bool yeniden = false});
 }
 
 /// Hiçbir şey yapmayan uygulama.
@@ -35,6 +42,10 @@ class SilentAudioService implements AudioService {
 
   @override
   Future<void> stop() async {}
+
+  /// Sessiz servis "sorun yok" der: testlerde uyarı bandı çıkmasın.
+  @override
+  Future<bool> hazirla({bool yeniden = false}) async => true;
 }
 
 /// Türkçe konuşabilen bir ses motoru seçer.
@@ -76,6 +87,22 @@ class TtsAudioService implements AudioService {
   /// speak()'i SESSİZCE REDDEDİYOR; çocuğun dokunuşuna verilen cevap
   /// kayboluyordu. Artık eskiyen istek hiç konuşmuyor.
   int _sonIstek = 0;
+
+  /// Ayarlama sonunda Türkçe konuşabilen bir motor bulundu mu?
+  bool _turkceHazir = false;
+
+  @override
+  Future<bool> hazirla({bool yeniden = false}) async {
+    // Yeniden kontrol: ebeveyn ses paketini yüklemiş olabilir.
+    // Saklanan ayarlama işini atıp baştan yapıyoruz.
+    if (yeniden) _ayarlama = null;
+    try {
+      await _configure();
+    } catch (_) {
+      return false;
+    }
+    return _turkceHazir;
+  }
 
   /// Ayarlama işi. Bir kez başlatılır; aynı anda gelen bütün konuşma
   /// istekleri AYNI işi bekler.
@@ -144,6 +171,13 @@ class TtsAudioService implements AudioService {
     // Otomatik geçiş övgünün bitmesini bu sayede bekleyebiliyor;
     // yoksa yeni soru okunmaya başlayınca "Elma! Aferin!" yarıda kesilirdi.
     await _tts.awaitSpeakCompletion(true);
+    try {
+      _turkceHazir = await _turkceVar();
+    } catch (_) {
+      // Bu platform dil sorgusunu desteklemiyorsa setLanguage'a güven.
+      _turkceHazir = dil == 1;
+    }
+    if (kDebugMode) debugPrint('TtsAudioService: turkceHazir=$_turkceHazir');
   }
 
   @override
@@ -154,6 +188,9 @@ class TtsAudioService implements AudioService {
       // Ayarlama beklenirken daha yeni bir istek geldiyse bu istek eskidi:
       // söylemenin anlamı yok, zaten hemen kesilecekti.
       if (benim != _sonIstek) return;
+      // Türkçe konuşan motor yok: bozuk telaffuzla konuşmak yerine sessiz
+      // kal. Ebeveyn ana ekrandaki uyarıyı görüyor.
+      if (!_turkceHazir) return;
       // Önceki okumayı kes: çocuk hızlı ilerlerse sesler üst üste binmesin.
       await _tts.stop();
       if (benim != _sonIstek) return;

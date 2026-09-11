@@ -40,4 +40,9 @@ abstract final class AppColors {
 
   /// Nötr buton - ana sayfaya dön.
   static const neutral = Color(0xFF8D6E63);
+
+  /// Ebeveyn uyarısı (ör. Türkçe ses yok) - kehribar, kırmızı değil:
+  /// bir arıza değil, yapılacak bir ayar var.
+  static const warning = Color(0xFFB26A00);
+  static const warningSurface = Color(0xFFFFF8E1);
 }

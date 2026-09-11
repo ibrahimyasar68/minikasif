@@ -216,4 +216,53 @@ void main() {
       expect(tts.motor, 'com.samsung.SMT');
     });
   });
+
+  group('Türkçe ses yoksa (hazirla ve sessizlik)', () {
+    const samsung = 'com.samsung.SMT';
+    const google = 'com.google.android.tts';
+
+    test('Türkçe bilen motor varsa hazirla true döner', () async {
+      final tts = SahteTts(varsayilan: samsung, motorlar: [samsung, google]);
+      expect(await TtsAudioService(tts: tts).hazirla(), isTrue);
+    });
+
+    test('hiçbir motor Türkçe bilmiyorsa hazirla false döner', () async {
+      final tts = SahteTts(
+        varsayilan: samsung,
+        turkceBilenler: const {},
+        motorlar: [samsung, google],
+      );
+      expect(await TtsAudioService(tts: tts).hazirla(), isFalse);
+    });
+
+    // Bozuk telaffuzla konuşmak yerine sessiz kal.
+    test('Türkçe yoksa speak hiç konuşmaz ama takılmadan biter', () async {
+      final tts = SahteTts(
+        varsayilan: samsung,
+        turkceBilenler: const {},
+        motorlar: [samsung],
+      );
+      await TtsAudioService(tts: tts).speak('Kediyi bul');
+
+      expect(tts.konusmalar, isEmpty);
+    });
+
+    test('ses paketi sonradan yüklenince yeniden kontrol onu bulur', () async {
+      final turkceBilenler = <String>{}; // başta hiçbiri
+      final tts = SahteTts(
+        varsayilan: samsung,
+        turkceBilenler: turkceBilenler,
+        motorlar: [samsung, google],
+      );
+      final servis = TtsAudioService(tts: tts);
+      expect(await servis.hazirla(), isFalse);
+
+      turkceBilenler.add(google); // ebeveyn Google Türkçe paketini indirdi
+      expect(await servis.hazirla(yeniden: true), isTrue);
+
+      await servis.speak('Kediyi bul');
+      expect(tts.konusmalar, ['Kediyi bul']);
+      expect(tts.motor, google);
+    });
+  });
 }

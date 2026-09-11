@@ -22,6 +22,9 @@ class FakeAudio implements AudioService {
 
   @override
   Future<void> stop() async => stops++;
+
+  @override
+  Future<bool> hazirla({bool yeniden = false}) async => true;
 }
 
 void main() {

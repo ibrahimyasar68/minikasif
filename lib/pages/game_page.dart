@@ -169,13 +169,16 @@ class _QuestionView extends StatelessWidget {
           // Soruyu tekrar dinle.
           // Çocuk sesi kaçırabilir veya tekrar duymak isteyebilir.
           // Okuma yazma gerektirmeyen tek erişim yolu bu.
-          IconButton(
-            onPressed: () => context.read<GameProvider>().repeatQuestion(),
-            icon: const Icon(Icons.volume_up_rounded),
-            iconSize: 48,
-            color: AppColors.primary,
-            tooltip: 'Tekrar dinle',
-          ),
+          // Türkçe ses yoksa bu buton hiçbir şey yapmaz; hiç göstermiyoruz.
+          // İşe yaramayan bir buton çocuğun kafasını karıştırır.
+          if (game.turkceSesVar != false)
+            IconButton(
+              onPressed: () => context.read<GameProvider>().repeatQuestion(),
+              icon: const Icon(Icons.volume_up_rounded),
+              iconSize: 48,
+              color: AppColors.primary,
+              tooltip: 'Tekrar dinle',
+            ),
 
           const SizedBox(height: 20),
 

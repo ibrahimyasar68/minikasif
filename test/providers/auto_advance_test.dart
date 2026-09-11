@@ -34,6 +34,9 @@ class KontrolluSes implements AudioService {
 
   @override
   Future<void> stop() async {}
+
+  @override
+  Future<bool> hazirla({bool yeniden = false}) async => true;
 }
 
 /// NEDEN testWidgets? Buradaki testlerde hiç widget yok.
