@@ -20,7 +20,12 @@ import 'game_page.dart';
 /// Ekranda değişen veri yok; ama sayfa AÇILDIĞINDA bir kez kutlama
 /// sesi çalmamız gerekiyor. Bu "bir kez" işi initState'e ait.
 class ResultPage extends StatefulWidget {
-  const ResultPage({super.key});
+  const ResultPage({super.key, this.yeniRekor = false});
+
+  /// Bu bölüm sonucu önceki en iyi skoru geçti mi?
+  /// Kayıt GamePage'de yapılıyor (bkz. oradaki açıklama); sonuç buraya
+  /// parametre olarak geliyor.
+  final bool yeniRekor;
 
   @override
   State<ResultPage> createState() => _ResultPageState();
@@ -35,7 +40,7 @@ class _ResultPageState extends State<ResultPage> {
     //
     // context.read kullanıyoruz (watch değil): burada dinlemiyoruz,
     // sadece bir metot çağırıyoruz.
-    context.read<GameProvider>().speakCompletion();
+    context.read<GameProvider>().speakCompletion(yeniRekor: widget.yeniRekor);
   }
 
   /// Oyun ekranını mevcut sayfanın YERİNE açar.
@@ -105,6 +110,22 @@ class _ResultPageState extends State<ResultPage> {
                         ),
                     ],
                   ),
+
+                  if (widget.yeniRekor) ...[
+                    const SizedBox(height: 12),
+
+                    Text(
+                      'Yeni rekor! 🏆',
+
+                      style: TextStyle(
+                        fontSize: 28,
+
+                        fontWeight: FontWeight.bold,
+
+                        color: renk.primaryDark,
+                      ),
+                    ),
+                  ],
 
                   const SizedBox(height: 12),
 

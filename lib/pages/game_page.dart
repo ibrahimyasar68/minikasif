@@ -3,6 +3,7 @@ import '../theme/app_colors.dart';
 import 'package:provider/provider.dart';
 import '../models/answer_option.dart';
 import '../providers/game_provider.dart';
+import '../providers/progress_provider.dart';
 import '../providers/settings_provider.dart';
 import '../widgets/answer_card.dart';
 import '../widgets/answer_grid.dart';
@@ -61,10 +62,23 @@ class _GamePageState extends State<GamePage> {
     if (!_game.isCompleted || _sonucaGecildi || !mounted) return;
     _sonucaGecildi = true;
 
+    // Skoru kaydet; en iyi skoru geçtiyse yeni rekor.
+    //
+    // Neden BURADA, ResultPage.initState'te değil?
+    // kaydet() notifyListeners() çağırıyor; bu da arkadaki ana sayfaya
+    // "yeniden çizil" diyor. initState ise ResultPage ÇİZİLİRKEN çalışır.
+    // Çizim sırasında başka bir widget'ı "yeniden çizilecek" diye
+    // işaretlemek "setState() or markNeedsBuild() called during build"
+    // hatasıdır. Bu metot ise bir dinleyici: çizimin dışında, güvenli.
+    final yeniRekor = context.read<ProgressProvider>().kaydet(
+      _game.section,
+      _game.starCount,
+    );
+
     // pushReplacement: geri tuşuyla bitmiş soruya dönülmesin.
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const ResultPage()),
+      MaterialPageRoute(builder: (context) => ResultPage(yeniRekor: yeniRekor)),
     );
   }
 

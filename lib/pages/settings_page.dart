@@ -2,19 +2,48 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/game_provider.dart';
+import '../providers/progress_provider.dart';
 import '../providers/settings_provider.dart';
 import '../theme/app_colors.dart';
 
-/// Ayarlar: ses açık/kapalı ve tema.
+/// Ayarlar: ses, tema ve ilerleme.
 ///
 /// Bu sayfa ebeveyn için. Çocuk için ekran büyük emoji ve az yazı ile
 /// kurulu; burada ise açıklayıcı metinler var.
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
+  /// Silme geri alınamaz: önce sor.
+  Future<void> _sifirlamayiSor(BuildContext context) async {
+    final onay = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('İlerleme sıfırlansın mı?'),
+        content: const Text('Bütün bölümlerin yıldızları silinir.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Vazgeç'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Sıfırla'),
+          ),
+        ],
+      ),
+    );
+    // await sonrası: bu sayfa bu arada kapanmış olabilir.
+    if (onay != true || !context.mounted) return;
+    context.read<ProgressProvider>().sifirla();
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('İlerleme sıfırlandı')));
+  }
+
   @override
   Widget build(BuildContext context) {
     final ayarlar = context.watch<SettingsProvider>();
+    final ilerlemeBos = context.select<ProgressProvider, bool>((p) => p.bosMu);
     final renk = AppColors.of(context);
 
     return Scaffold(
@@ -95,6 +124,31 @@ class SettingsPage extends StatelessWidget {
               child: Text(
                 '"Sistem" seçiliyken telefonun açık/koyu ayarına uyulur.',
                 style: TextStyle(color: renk.textMuted),
+              ),
+            ),
+            const SizedBox(height: 24),
+            const _Baslik('İlerleme'),
+            Card(
+              color: renk.surface,
+              child: ListTile(
+                leading: Icon(
+                  Icons.restart_alt_rounded,
+                  color: ilerlemeBos ? renk.textMuted : renk.primary,
+                  size: 32,
+                ),
+                title: Text(
+                  'İlerlemeyi sıfırla',
+                  style: TextStyle(fontSize: 20, color: renk.text),
+                ),
+                subtitle: Text(
+                  ilerlemeBos
+                      ? 'Henüz kazanılmış yıldız yok'
+                      : 'Bütün bölümlerin yıldızları silinir',
+                  style: TextStyle(color: renk.textMuted),
+                ),
+                // Silinecek bir şey yoksa buton pasif.
+                enabled: !ilerlemeBos,
+                onTap: () => _sifirlamayiSor(context),
               ),
             ),
           ],

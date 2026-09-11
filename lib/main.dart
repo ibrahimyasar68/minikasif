@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'pages/home_page.dart';
 import 'providers/game_provider.dart';
+import 'providers/progress_provider.dart';
 import 'providers/settings_provider.dart';
 import 'services/audio_service.dart';
 import 'theme/app_theme.dart';
@@ -39,6 +40,7 @@ class MiniKesifApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => SettingsProvider(prefs: prefs)),
+        ChangeNotifierProvider(create: (_) => ProgressProvider(prefs: prefs)),
         ChangeNotifierProvider(
           // Oyun "konuş" der; ToggleableAudioService ses ayarı kapalıysa
           // yutar. context.read çağrısı her konuşmada yapılır: ayar

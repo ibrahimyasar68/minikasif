@@ -3,6 +3,7 @@ import '../theme/app_colors.dart';
 import 'package:provider/provider.dart';
 import '../models/game_section.dart';
 import '../providers/game_provider.dart';
+import '../providers/progress_provider.dart';
 import '../providers/settings_provider.dart';
 import 'game_page.dart';
 import '../widgets/parent_gate_button.dart';
@@ -148,7 +149,8 @@ class _TurkceSesUyarisi extends StatelessWidget {
   }
 }
 
-/// Tek bir bölüm butonu.
+/// Tek bir bölüm butonu. Bölümün en iyi skoru yıldızlarla görünür;
+/// hiç oynanmadıysa boş yıldızlar (☆☆☆) çocuğu denemeye çağırır.
 class _SectionButton extends StatelessWidget {
   final GameSection section;
 
@@ -157,6 +159,11 @@ class _SectionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final renk = AppColors.of(context);
+    // select: sadece BU bölümün skoru değişince bu buton yeniden çizilir.
+    final yildiz = context.select<ProgressProvider, int>(
+      (p) => p.enIyi(section),
+    );
+
     return SizedBox(
       width: 300,
       height: 110,
@@ -182,12 +189,44 @@ class _SectionButton extends StatelessWidget {
           children: [
             Text(section.emoji, style: const TextStyle(fontSize: 52)),
             const SizedBox(width: 20),
+            // FittedBox: içerik butona sığmazsa taşmak yerine küçülür.
+            // Başlık + yıldız satırı normalde sığıyor; ama telefonda "büyük
+            // yazı" ayarı açıksa başlık iki satıra bölünüp 110 px'lik
+            // butondan taşıyordu (testlerde yakalandı).
             Flexible(
-              child: Text(
-                section.title,
-                style: const TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      section.title,
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    // Ekran okuyucu yıldız simgelerini tek tek okumasın;
+                    // "2 / 3 yıldız" desin.
+                    Semantics(
+                      label: '$yildiz / 3 yıldız',
+                      excludeSemantics: true,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          for (var i = 0; i < 3; i++)
+                            Icon(
+                              i < yildiz ? Icons.star : Icons.star_border,
+                              size: 24,
+                              color: renk.star,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

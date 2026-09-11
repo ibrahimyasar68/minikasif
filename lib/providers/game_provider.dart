@@ -283,13 +283,14 @@ class GameProvider extends ChangeNotifier {
   /// Metin skora göre değişiyor ama HEPSİ olumlu.
   /// Az yıldız alan çocuğa da "bölümü bitirdin" diyoruz,
   /// "az bildin" demiyoruz (CLAUDE.md md.18).
-  void speakCompletion() {
+  void speakCompletion({bool yeniRekor = false}) {
     final mesaj = switch (starCount) {
       3 => 'Harikasın! Hepsini bildin.',
       2 => 'Aferin! Çok güzel oynadın.',
       _ => 'Bölümü bitirdin, tebrikler!',
     };
-    _audio.speak(mesaj);
+    // Çocuk ekrandaki "Yeni rekor!" yazısını okuyamaz: sesli de söylüyoruz.
+    _audio.speak(yeniRekor ? 'Yeni rekor! $mesaj' : mesaj);
   }
 
   // --- Ses hazırlığı ---
