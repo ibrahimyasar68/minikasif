@@ -59,9 +59,9 @@ void main() {
     // Bölümü bitir.
     for (final dogru in ['Elma', 'Muz', 'Portakal', 'Çilek']) {
       await tester.tap(find.text(dogru));
-      await tester.pump();
+      await tester.pumpAndSettle();
       await tester.tap(find.textContaining(RegExp('Devam|Bitir')));
-      await tester.pump();
+      await tester.pumpAndSettle();
     }
 
     // Yıldız satırı dar bir içerik: Column büzülürse en net buradan belli olur.

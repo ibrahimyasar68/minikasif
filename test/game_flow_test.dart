@@ -21,12 +21,12 @@ void main() {
     for (var i = 0; i < dogrular.length; i++) {
       if (i < hataliSayisi) {
         await tester.tap(find.text(yanlislar[i]));
-        await tester.pump();
+        await tester.pumpAndSettle();
       }
       await tester.tap(find.text(dogrular[i]));
-      await tester.pump();
+      await tester.pumpAndSettle();
       await tester.tap(find.textContaining(RegExp('Devam|Bitir')));
-      await tester.pump();
+      await tester.pumpAndSettle();
     }
   }
 
@@ -42,7 +42,7 @@ void main() {
     testWidgets('Doğru cevap: Aferin mesajı ve onay rozeti', (tester) async {
       await bolumuAc(tester);
       await tester.tap(find.text('Elma'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text('Aferin! 🎉'), findsOneWidget);
       expect(find.byIcon(Icons.check_circle), findsOneWidget);
@@ -51,7 +51,7 @@ void main() {
     testWidgets('Yanlış cevap: nazik mesaj, oyun devam eder', (tester) async {
       await bolumuAc(tester);
       await tester.tap(find.text('Muz'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text('Tekrar dene 🙂'), findsOneWidget);
       expect(find.byIcon(Icons.check_circle), findsNothing);
@@ -60,11 +60,11 @@ void main() {
     testWidgets('Yanlıştan sonra doğruyu bulabilir', (tester) async {
       await bolumuAc(tester);
       await tester.tap(find.text('Muz'));
-      await tester.pump();
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Üzüm'));
-      await tester.pump();
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Elma'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text('Aferin! 🎉'), findsOneWidget);
     });
@@ -72,9 +72,9 @@ void main() {
     testWidgets('Doğru cevaptan sonra kartlar kilitlenir', (tester) async {
       await bolumuAc(tester);
       await tester.tap(find.text('Elma'));
-      await tester.pump();
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Muz'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text('Aferin! 🎉'), findsOneWidget);
       expect(find.text('Tekrar dene 🙂'), findsNothing);
@@ -85,11 +85,11 @@ void main() {
       expect(find.text('Devam →'), findsNothing);
 
       await tester.tap(find.text('Muz'));
-      await tester.pump();
+      await tester.pumpAndSettle();
       expect(find.text('Devam →'), findsNothing, reason: 'yanlışta ilerleme');
 
       await tester.tap(find.text('Elma'));
-      await tester.pump();
+      await tester.pumpAndSettle();
       expect(find.text('Devam →'), findsOneWidget);
     });
   });
@@ -99,30 +99,30 @@ void main() {
       await bolumuAc(tester);
 
       await tester.tap(find.text('Elma'));
-      await tester.pump();
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Devam →'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text('Soru 2 / 4'), findsOneWidget);
       expect(find.text('Sarı muzu bul'), findsOneWidget);
 
       await tester.tap(find.text('Muz'));
-      await tester.pump();
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Devam →'));
-      await tester.pump();
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Portakal'));
-      await tester.pump();
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Devam →'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       // Son soruda buton metni değişir.
       expect(find.text('Soru 4 / 4'), findsOneWidget);
       await tester.tap(find.text('Çilek'));
-      await tester.pump();
+      await tester.pumpAndSettle();
       expect(find.text('Bitir 🏁'), findsOneWidget);
 
       await tester.tap(find.text('Bitir 🏁'));
-      await tester.pump();
+      await tester.pumpAndSettle();
       expect(find.text('Tebrikler!'), findsOneWidget);
     });
 
@@ -132,11 +132,11 @@ void main() {
       await bolumuAc(tester);
 
       await tester.tap(find.text('Muz')); // 1. soruda yanlış
-      await tester.pump();
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Elma'));
-      await tester.pump();
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Devam →'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       // 2. soruda Muz doğru cevap; soluk değil normal görünmeli.
       final muzKarti = tester.widget<AnswerCard>(
@@ -177,7 +177,7 @@ void main() {
       await bolumuAc(tester);
       await bolumuBitir(tester); // 3 yıldız
       await tester.tap(find.text('Tekrar oyna'));
-      await tester.pump();
+      await tester.pumpAndSettle();
       await bolumuBitir(tester, hataliSayisi: 4);
 
       expect(find.byIcon(Icons.star), findsNWidgets(1),
@@ -199,9 +199,9 @@ void main() {
     testWidgets('Bölüm değişince ilerleme sıfırlanır', (tester) async {
       await bolumuAc(tester);
       await tester.tap(find.text('Elma'));
-      await tester.pump();
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Devam →'));
-      await tester.pump();
+      await tester.pumpAndSettle();
       expect(find.text('Soru 2 / 4'), findsOneWidget);
 
       // Geri dön, başka bölüme gir.

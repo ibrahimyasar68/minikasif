@@ -46,64 +46,80 @@ class AnswerCard extends StatelessWidget {
     // Yanlış kart soluklaşsın ama KAYBOLMASIN.
     // Çocuğu cezalandırmıyoruz, sadece "bu değil" diyoruz (CLAUDE.md md.18).
     final opacity = status == AnswerStatus.wrong ? 0.45 : 1.0;
+    final isCorrect = status == AnswerStatus.correct;
 
-    return Opacity(
-      opacity: opacity,
-      child: SizedBox(
-        width: 150,
-        height: 150,
-        child: Material(
-          color: _backgroundColor,
-          borderRadius: BorderRadius.circular(24),
-          elevation: status == AnswerStatus.correct ? 8 : 3,
-          child: InkWell(
-            // onTap null ise InkWell dokunmayı yok sayar, dalga da çizmez.
-            onTap: onTap,
+    // AnimatedScale: doğru kart hafifçe büyür.
+    //
+    // "Implicit animation" denen yaklaşım: AnimationController yazmıyoruz,
+    // sadece scale DEĞERİNİ değiştiriyoruz. Flutter aradaki geçişi
+    // kendisi üretiyor. Basit durum geçişleri için doğru araç bu.
+    return AnimatedScale(
+      scale: isCorrect ? 1.06 : 1.0,
+      duration: const Duration(milliseconds: 260),
+      // easeOutBack hafif bir "yaylanma" verir: başarı hissi.
+      curve: Curves.easeOutBack,
+      child: AnimatedOpacity(
+        opacity: opacity,
+        duration: const Duration(milliseconds: 220),
+        child: SizedBox(
+          width: 150,
+          height: 150,
+          child: Material(
+            color: _backgroundColor,
             borderRadius: BorderRadius.circular(24),
-            child: Stack(
-              children: [
-                Center(
-                  // FittedBox: içerik sığmazsa küçültür, taşmaz.
-                  // Bu olmadan emoji + yazı bazı cihaz/font ayarlarında
-                  // 150px'i aşıp "RenderFlex overflowed" hatası veriyordu.
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Column(
-                        // min: Column sadece içeriği kadar yer kaplasın.
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            option.emoji,
-                            style: const TextStyle(fontSize: 72),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            option.label,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              color: Colors.black54,
+            elevation: isCorrect ? 8 : 3,
+            // Material renk ve yükseklik değişimini kendisi animasyonlar.
+            // Ayrı bir AnimatedContainer'a gerek yok.
+            animationDuration: const Duration(milliseconds: 260),
+            child: InkWell(
+              // onTap null ise InkWell dokunmayı yok sayar, dalga da çizmez.
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(24),
+              child: Stack(
+                children: [
+                  Center(
+                    // FittedBox: içerik sığmazsa küçültür, taşmaz.
+                    // Bu olmadan emoji + yazı bazı cihaz/font ayarlarında
+                    // 150px'i aşıp "RenderFlex overflowed" hatası veriyordu.
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Column(
+                          // min: Column sadece içeriği kadar yer kaplasın.
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              option.emoji,
+                              style: const TextStyle(fontSize: 72),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 8),
+                            Text(
+                              option.label,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                // Doğru kartın köşesinde onay rozeti.
-                // Stack çocukları üst üste bindirir; Positioned yerini belirler.
-                if (status == AnswerStatus.correct)
-                  const Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Icon(
-                      Icons.check_circle,
-                      color: Color(0xFF2E7D32),
-                      size: 32,
+                  // Doğru kartın köşesinde onay rozeti.
+                  // Stack çocukları üst üste bindirir; Positioned yerini belirler.
+                  if (status == AnswerStatus.correct)
+                    const Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Icon(
+                        Icons.check_circle,
+                        color: Color(0xFF2E7D32),
+                        size: 32,
+                      ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
