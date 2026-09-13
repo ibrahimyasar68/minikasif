@@ -2,7 +2,7 @@
 """MiniKesif uygulama ikonunu üretir.
 
 Tasarım: turuncu zemin üzerinde büyüteç; merceğin içinde kırmızı bir elma
-("bir şey keşfettik") ve köşede küçük bir parıltı. İkon koddan çizildiği için
+("bir şey keşfettik"), köşede küçük bir parıltı ve sağ altta "IY Labs" etiketi. İkon koddan çizildiği için
 renk ya da şekil değişirse tek komutla yeniden üretilebilir; dışarıdan bir
 görsel ya da paket gerekmez (sadece Pillow).
 
@@ -17,7 +17,9 @@ Katman 108 dp'dir; her kırpmada görünmesi garanti olan GÜVENLİ ALAN merkezd
 """
 import argparse
 import math
+import os
 import pathlib
+import shutil
 import sys
 
 from PIL import Image, ImageDraw, ImageFont
@@ -46,6 +48,18 @@ SAP_BOY = 16.0
 SAP_EN = 9.0
 GUVENLI_YARICAP = 33.0  # 66 dp çaplı güvenli alan
 
+# Büyüteç grubu küçültülüp sol üste kaydırılıyor: sağ altta etikete yer açılsın.
+GRUP_OLCEK = 0.84
+GRUP_KAYMA = (-3.0, -3.0)
+
+# "IY Labs" etiketi. Tam köşeye KONAMAZ: telefonların çoğu ikonu daire ya da
+# yuvarlak kare şeklinde kırpar, köşeler kesilir. Güvenli dairenin içindeki en
+# sağ-alt konum kullanılıyor.
+ETIKET_METIN = "IY Labs"
+ETIKET_MERKEZ = (62.0, 77.5)
+ETIKET_EN = 24.0
+ETIKET_BOY = 8.5
+
 
 class Tuval:
     """108 birimlik koordinatlarla çizim; içeride size*S piksel."""
@@ -54,8 +68,13 @@ class Tuval:
         self.size = size
         self.k = size * S / 108
         self.img = Image.new("RGBA", (size * S, size * S), (0, 0, 0, 0))
+        # Çizilen şekillere uygulanan ölçek ve kayma (tuval merkezine göre).
+        self.olcek = 1.0
+        self.kayma = (0.0, 0.0)
 
     def p(self, x, y):
+        x = (x - 54) * self.olcek + 54 + self.kayma[0]
+        y = (y - 54) * self.olcek + 54 + self.kayma[1]
         return (x * self.k, y * self.k)
 
     def daire(self, cx, cy, r, renk):
@@ -79,7 +98,9 @@ class Tuval:
 
     def katman(self):
         """Yarı saydam şekiller için ayrı katman (alfa ile birleştirilir)."""
-        return Tuval(self.size)
+        k = Tuval(self.size)
+        k.olcek, k.kayma = self.olcek, self.kayma
+        return k
 
     def birlestir(self, ust):
         self.img = Image.alpha_composite(self.img, ust.img)
@@ -113,6 +134,7 @@ def on_plan(size, tek_renk=False):
     bırakılır ki elma çerçeveden ayrı okunsun.
     """
     t = Tuval(size)
+    t.olcek, t.kayma = GRUP_OLCEK, GRUP_KAYMA
     koyu = BEYAZ if tek_renk else KOYU
     u = (math.cos(math.radians(45)), math.sin(math.radians(45)))
 
@@ -135,7 +157,7 @@ def on_plan(size, tek_renk=False):
         k = t.katman()
         ImageDraw.Draw(k.img).arc(
             [*k.p(L[0] - 12, L[1] - 12), *k.p(L[0] + 12, L[1] + 12)],
-            start=200, end=250, fill=(255, 255, 255, 170), width=int(2.2 * k.k))
+            start=200, end=250, fill=(255, 255, 255, 170), width=int(2.2 * k.k * k.olcek))
         t.birlestir(k)
 
     # Elma
@@ -155,7 +177,60 @@ def on_plan(size, tek_renk=False):
     # Parıltı
     t.cokgen(yildiz(L[0] + 19.5, L[1] - 17.5, 5.2, 1.3), BEYAZ)
     t.daire(L[0] + 25.5, L[1] - 9.0, 1.2, BEYAZ)
+
+    # Etiket gruptan bağımsız konumlanıyor.
+    t.olcek, t.kayma = 1.0, (0.0, 0.0)
+    etiket_ciz(t, tek_renk)
     return t.sonuc()
+
+
+_FONT_YOLU = None
+
+
+def kalin_font():
+    """Uygulamanın da kullandığı Roboto Bold (Flutter SDK içinde gelir).
+
+    Başka bir fonta sessizce düşmüyoruz: ikon her makinede aynı üretilmeli.
+    """
+    global _FONT_YOLU
+    if _FONT_YOLU is None:
+        kok = os.environ.get("FLUTTER_ROOT")
+        if not kok and shutil.which("flutter"):
+            kok = str(pathlib.Path(shutil.which("flutter")).resolve().parent.parent)
+        yol = pathlib.Path(kok or "") / "bin/cache/artifacts/material_fonts/Roboto-Bold.ttf"
+        if not kok or not yol.exists():
+            sys.exit("Roboto-Bold.ttf bulunamadı: Flutter SDK kurulu mu? (FLUTTER_ROOT)")
+        _FONT_YOLU = str(yol)
+    return _FONT_YOLU
+
+
+def etiket_ciz(t, tek_renk):
+    """Koyu kapsül içinde beyaz 'IY Labs'. Temalı ikonda yazı oyulur."""
+    cx, cy = ETIKET_MERKEZ
+    x0, y0 = t.p(cx - ETIKET_EN / 2, cy - ETIKET_BOY / 2)
+    x1, y1 = t.p(cx + ETIKET_EN / 2, cy + ETIKET_BOY / 2)
+    yaricap = (y1 - y0) / 2
+    ImageDraw.Draw(t.img).rounded_rectangle(
+        [x0, y0, x1, y1], radius=yaricap, fill=BEYAZ if tek_renk else KOYU)
+
+    # Yazıyı kapsüle sığacak en büyük boyutta seç.
+    en_fazla_en = (x1 - x0) - 1.8 * yaricap
+    en_fazla_boy = (y1 - y0) * 0.6
+    boyut = int(y1 - y0)
+    while True:
+        font = ImageFont.truetype(kalin_font(), boyut)
+        sol, ust, sag, alt = font.getbbox(ETIKET_METIN)
+        if (sag - sol <= en_fazla_en and alt - ust <= en_fazla_boy) or boyut <= 4:
+            break
+        boyut -= 1
+    tx = (x0 + x1) / 2 - (sol + sag) / 2
+    ty = (y0 + y1) / 2 - (ust + alt) / 2
+    if tek_renk:
+        m = Image.new("L", t.img.size, 0)
+        ImageDraw.Draw(m).text((tx, ty), ETIKET_METIN, font=font, fill=255)
+        t.img = Image.composite(Image.new("RGBA", t.img.size, (0, 0, 0, 0)), t.img, m)
+    else:
+        ImageDraw.Draw(t.img).text((tx, ty), ETIKET_METIN, font=font, fill=BEYAZ)
 
 
 def arka_plan(size):
