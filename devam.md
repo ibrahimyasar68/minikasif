@@ -1,6 +1,6 @@
 # MiniKesif — Devam Notu
 
-> Son güncelleme: 2026-09-14 · Son commit: `f1fb5b6` (PHASE 25)
+> Son güncelleme: 2026-09-14 · Son commit: `0353f7a` (PHASE 25.1)
 > Bu not, projeye ara verdikten sonra kaldığın yerden devam edebilmen için
 > hazırlandı. Yeni bir oturumda önce bu dosyayı ve `CLAUDE.md`'yi oku.
 
@@ -14,14 +14,14 @@
 | Bilgi | Değer |
 |---|---|
 | Uygulama kimliği | `com.iylabs.minikesif` (yayından sonra değiştirilemez) |
-| Launcher adı | `Mini Kesif` |
+| Ad | `Mini Kesif` (her yerde; ş'siz yazım bilinçli) |
 | Sürüm | `1.0.0+1` (`pubspec.yaml`) |
 | Dart paket adı | `mini_kesif` (sadece iç import adı, değişmedi) |
 | Platform | Android (iOS hedeflenmiyor; bu makinede Xcode yok) |
 | Flutter | 3.35.6 stable, Dart SDK ^3.9.2 |
 | Paketler | `provider`, `flutter_tts`, `shared_preferences` (+ `cupertino_icons`) |
 | İçerik | 3 bölüm × 10 soru = 30 soru |
-| Testler | 25 test dosyası, **186 test** (hepsi geçiyor) |
+| Testler | 26 test dosyası, **188 test** (hepsi geçiyor) |
 | Hedef | Play Store'da yayınlamak |
 
 **Çalışma şekli** (`CLAUDE.md`): Kodu AI yazar. Proje safha safha ilerler;
@@ -63,6 +63,7 @@ Service (AudioService) + Data (question_data)
 
 | Dosya | Görevi |
 |---|---|
+| `lib/app_info.dart` | Uygulama adı sabiti (`appName`) |
 | `lib/main.dart` | Açılışta ayarları yükler, 3 provider'ı kurar, temayı bağlar |
 | `lib/models/question.dart` | Soru: metin, sesli metin, seçenekler, doğru cevap |
 | `lib/models/answer_option.dart` | Seçenek: id, etiket, emoji |
@@ -92,6 +93,7 @@ Diğer klasörler:
 | `docs/play_store_hazirlik.md` | Play Store yayın kontrol listesi |
 | `docs/gizlilik_politikasi.md` | Gizlilik politikası taslağı |
 | `android/key.properties.example` | İmza bilgisi şablonu (parolasız) |
+| `test/app_adi_test.dart` | Launcher adı ile uygulama içi ad eşit mi |
 | `test/helpers/oyun.dart` | Cevapları veriden okuyan ortak test adımları |
 | `test/helpers/gercek_font.dart` | Yerleşim testleri için gerçek Roboto fontu |
 | `test/fixtures/android8_emoji_kapsami.txt` | Android 8 emoji fontunun karakter listesi |
@@ -121,6 +123,7 @@ Diğer klasörler:
 | 24 | Uygulama ikonu: büyüteç, içinde elma, parıltı | `328beb5` |
 | 24.1 | İkona "IY Labs" etiketi | `a0e89b7` |
 | 25 | Yayına hazırlık: ad, kimlik, imza altyapısı, belgeler (**kısmen**) | `f1fb5b6` |
+| 25.1 | Ad tutarsızlığı: her yerde `Mini Kesif`, sabit + manifest testi | `0353f7a` |
 
 Her commit mesajında o safhanın ayrıntılı açıklaması var:
 `git log` ile okunabilir.
@@ -160,6 +163,12 @@ Tekrar düşmemek için bilinmesi gerekenler.
   Rekor bu yüzden `GamePage`'in dinleyicisinde kaydediliyor.
 - Flutter, Gradle uyarılarını ekranda göstermez. Önemli durumlar hata
   olarak verilmeli.
+
+**Ad**
+- Uygulama adı her yerde **`Mini Kesif`** (ş'siz; kullanıcı tercihi).
+  Dart tarafı `lib/app_info.dart` içindeki `appName`'i kullanır;
+  AndroidManifest bu sabiti okuyamadığı için elle yazılı, eşitliği
+  `test/app_adi_test.dart` koruyor.
 
 **Testler**
 - Test ortamının fontu her harfi kare çizer ve metni çok uzun ölçer.
@@ -232,9 +241,6 @@ Kartlarda emoji yerine resim.
 - [ ] **Telefona güncel sürüm:** telefonda hâlâ PHASE 20 civarı, eski
       kimlikli (`com.minikesif.mini_kesif`) sürüm var. Yeni sürümü kurduktan
       sonra eski uygulamayı telefondan elle sil.
-- [ ] **Ad tutarsızlığı:** launcher adı `Mini Kesif` (ş'siz, kullanıcı
-      tercihi), uygulama içi başlık `Mini Keşif`. Hangisinin kullanılacağına
-      karar verilmeli.
 - [ ] **Telaffuz kontrolü:** "İneği", "Şemsiyeyi" gibi kelimelerin TTS
       telaffuzu kulakla dinlenmedi.
 - [ ] Soru geçişinde çapraz solumada iki soru metni ~320 ms üst üste
