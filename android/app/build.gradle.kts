@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -5,8 +8,21 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Release imza bilgileri: android/key.properties
+//
+// Bu dosya ve anahtar (.jks) GIT'E GİRMEZ (android/.gitignore). İçinde
+// parola var; biri ele geçirirse uygulama adına sahte güncelleme imzalayabilir.
+// Şablon: android/key.properties.example
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+val releaseKeyVar = keystorePropertiesFile.exists()
+if (releaseKeyVar) {
+    FileInputStream(keystorePropertiesFile).use { keystoreProperties.load(it) }
+}
+
 android {
-    namespace = "com.minikesif.mini_kesif"
+    // Uygulama kimliği. Play Store'da yayınlandıktan sonra DEĞİŞTİRİLEMEZ.
+    namespace = "com.iylabs.minikesif"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -20,22 +36,54 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.minikesif.mini_kesif"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        applicationId = "com.iylabs.minikesif"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
+        // pubspec.yaml'daki "version: 1.0.0+1" -> versionName 1.0.0, versionCode 1.
+        // Play Store'a her yüklemede versionCode (+ sonrası) artırılmalı.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        create("release") {
+            if (releaseKeyVar) {
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+                storeFile = file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (releaseKeyVar) {
+                signingConfigs.getByName("release")
+            } else {
+                // Anahtar yoksa derleme yine çalışsın (telefonda denemek için),
+                // ama bu dosya Play Store'a YÜKLENEMEZ.
+                logger.warn(
+                    "UYARI: android/key.properties bulunamadı. Release DEBUG " +
+                        "anahtarıyla imzalanıyor; Play Store bu dosyayı kabul etmez."
+                )
+                signingConfigs.getByName("debug")
+            }
         }
+    }
+}
+
+// .aab, Play Store'a YÜKLENEN dosya. Anahtar yoksa derlemeyi açık bir hatayla
+// durduruyoruz. Neden uyarı değil de hata? Flutter, Gradle uyarılarını ekranda
+// göstermiyor; uyarı gözden kaçıyor ve debug imzalı dosya yüklenmeye
+// çalışılıyordu. .apk (telefonda denemek için) debug imzasıyla çalışmaya devam eder.
+gradle.taskGraph.whenReady {
+    if (!releaseKeyVar && allTasks.any { it.name == "bundleRelease" }) {
+        throw GradleException(
+            "Play Store paketi (.aab) için imza anahtarı gerekli: " +
+                "android/key.properties bulunamadı. " +
+                "Şablon: android/key.properties.example"
+        )
     }
 }
 

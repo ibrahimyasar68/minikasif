@@ -1,0 +1,11 @@
+# Release imza bilgileri - ŞABLON.
+#
+# 1) Bu dosyayı aynı klasöre "key.properties" adıyla kopyalayın.
+# 2) Değerleri kendi anahtarınıza göre doldurun.
+# 3) key.properties ve .jks dosyası git'e GİRMEZ (.gitignore).
+#
+# Anahtarı ve parolaları güvenli bir yerde (ör. parola yöneticisi) yedekleyin.
+storePassword=ANAHTAR_DEPOSU_PAROLASI
+keyPassword=ANAHTAR_PAROLASI
+keyAlias=upload
+storeFile=/Users/KULLANICI/iylabs-keys/minikesif-upload.jks
