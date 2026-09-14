@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../app_info.dart';
 import '../theme/app_colors.dart';
 import 'package:provider/provider.dart';
 import '../models/game_section.dart';
@@ -47,7 +48,7 @@ class HomePage extends StatelessWidget {
                     const Text('🔍', style: TextStyle(fontSize: 80)),
                     const SizedBox(height: 8),
                     Text(
-                      'Mini Keşif',
+                      appName,
                       style: TextStyle(
                         fontSize: 44,
                         fontWeight: FontWeight.bold,

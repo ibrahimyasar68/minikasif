@@ -103,7 +103,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Sesli okuma'), findsNothing);
-      expect(find.text('Mini Keşif'), findsOneWidget);
+      expect(find.text('Mini Kesif'), findsOneWidget);
     });
 
     testWidgets('basılı tutunca ayarlar açılır', (tester) async {

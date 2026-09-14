@@ -107,7 +107,7 @@ void main() {
     final sinir = (2400 - 63) / 2.625;
 
     // Gerçek font: test fontu metni cihazdakinden çok daha uzun ölçüyor
-    // ("Mini Keşif" bile iki satıra bölünüyordu). O zaman bu test cihazı
+    // ("Mini Kesif" bile iki satıra bölünüyordu). O zaman bu test cihazı
     // değil, test fontunu ölçerdi.
     final fontVar = await tester.runAsync(gercekFontuYukle);
     expect(fontVar, isTrue, reason: "Roboto yüklenemedi (FLUTTER_ROOT?)");

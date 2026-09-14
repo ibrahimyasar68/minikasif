@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'app_info.dart';
 import 'pages/home_page.dart';
 import 'providers/game_provider.dart';
 import 'providers/progress_provider.dart';
@@ -58,7 +59,7 @@ class MiniKesifApp extends StatelessWidget {
       child: Selector<SettingsProvider, ThemeMode>(
         selector: (_, ayarlar) => ayarlar.temaModu,
         builder: (context, temaModu, _) => MaterialApp(
-          title: 'MiniKesif',
+          title: appName,
           debugShowCheckedModeBanner: false,
           theme: acikTema,
           darkTheme: koyuTema,

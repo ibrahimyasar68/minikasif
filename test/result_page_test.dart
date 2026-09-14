@@ -86,7 +86,7 @@ void main() {
 
     await dokun(tester, find.text('Ana sayfa'));
 
-    expect(find.text('Mini Keşif'), findsOneWidget);
+    expect(find.text('Mini Kesif'), findsOneWidget);
     for (final s in GameSection.values) {
       expect(find.text(s.title), findsOneWidget, reason: s.title);
     }
