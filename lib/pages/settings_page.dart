@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../app_info.dart';
 import '../providers/game_provider.dart';
 import '../providers/progress_provider.dart';
 import '../providers/settings_provider.dart';
 import '../theme/app_colors.dart';
 
-/// Ayarlar: ses, tema ve ilerleme.
+/// Ayarlar: ses, tema, ilerleme ve uygulama hakkında bilgi.
 ///
 /// Bu sayfa ebeveyn için. Çocuk için ekran büyük emoji ve az yazı ile
 /// kurulu; burada ise açıklayıcı metinler var.
@@ -151,6 +152,9 @@ class SettingsPage extends StatelessWidget {
                 onTap: () => _sifirlamayiSor(context),
               ),
             ),
+            const SizedBox(height: 24),
+            const _Baslik('Hakkında'),
+            const _Hakkinda(),
           ],
         ),
       ),
@@ -174,4 +178,106 @@ class _Baslik extends StatelessWidget {
       ),
     ),
   );
+}
+
+/// Ebeveyn için: oyun ne, veriler nerede, kime ulaşılır.
+class _Hakkinda extends StatelessWidget {
+  const _Hakkinda();
+
+  @override
+  Widget build(BuildContext context) {
+    final renk = AppColors.of(context);
+    final aciklama = TextStyle(fontSize: 16, height: 1.4, color: renk.text);
+
+    return Card(
+      color: renk.surface,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Text('🔍', style: TextStyle(fontSize: 32)),
+                const SizedBox(width: 12),
+                Text(
+                  appName,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: renk.primaryDark,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              '0–4 yaş çocuklar için dinle, bak ve dokun oyunu. Çocuk sesli '
+              'komutu dinler, doğru resme dokunur; renkleri, meyveleri, '
+              'hayvanları ve nesneleri oynayarak tanır.',
+              style: aciklama,
+            ),
+            const SizedBox(height: 12),
+            // Gizlilik politikasıyla (docs/gizlilik_politikasi.md) aynı
+            // şeyleri söylemeli. Politika değişirse burası da değişir.
+            Text(
+              'İnternet gerekmez, reklam yoktur, hiçbir kişisel veri '
+              'toplanmaz. Ayarlar ve yıldızlar yalnızca bu cihazda saklanır.',
+              style: TextStyle(
+                fontSize: 14,
+                height: 1.4,
+                color: renk.textMuted,
+              ),
+            ),
+            const Divider(height: 32),
+            Row(
+              children: [
+                Icon(Icons.mail_outline_rounded, color: renk.primary),
+                const SizedBox(width: 12),
+                // SelectableText: basılı tutunca kopyalanabilir. Dokununca
+                // e-posta uygulamasını açmak için url_launcher paketi
+                // gerekirdi; şimdilik kopyalamak yeterli.
+                Expanded(
+                  child: SelectableText(
+                    contactEmail,
+                    style: TextStyle(fontSize: 16, color: renk.text),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Center(child: _EtiketRozeti(developerName)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// İkondaki "IY Labs" etiketinin uygulama içi karşılığı: yuvarlak köşeli
+/// küçük bir rozet.
+class _EtiketRozeti extends StatelessWidget {
+  const _EtiketRozeti(this.metin);
+  final String metin;
+
+  @override
+  Widget build(BuildContext context) {
+    final renk = AppColors.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      decoration: BoxDecoration(
+        color: renk.primary,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        metin,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 0.5,
+          color: renk.onPrimary,
+        ),
+      ),
+    );
+  }
 }

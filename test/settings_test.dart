@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mini_kesif/app_info.dart';
 import 'package:mini_kesif/main.dart';
 import 'package:mini_kesif/models/game_section.dart';
 import 'package:mini_kesif/services/audio_service.dart';
 import 'package:mini_kesif/theme/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'helpers/gercek_font.dart';
 import 'helpers/oyun.dart';
 
 class KayitSes implements AudioService {
@@ -132,5 +134,51 @@ void main() {
     expect(temaModu(tester), ThemeMode.dark);
     await bolumeGir(tester, GameSection.fruits);
     expect(ses.konusmalar, isEmpty, reason: 'ses kapalı kaydedilmişti');
+  });
+
+  group('Hakkında', () {
+    /// ListView tembel kurar: en alttaki kart kaydırılmadan ağaçta yok.
+    Future<void> hakkindayaKaydir(WidgetTester tester) async {
+      await tester.scrollUntilVisible(
+        find.text(developerName),
+        200,
+        scrollable: find.byType(Scrollable).last,
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('oyun bilgisi, e-posta ve IY Labs etiketi görünür', (
+      tester,
+    ) async {
+      await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+      await tester.pumpAndSettle();
+      await ayarlariAc(tester);
+      await hakkindayaKaydir(tester);
+
+      expect(find.text('Hakkında'), findsOneWidget);
+      expect(find.textContaining('dinle, bak ve dokun'), findsOneWidget);
+      expect(find.textContaining('hiçbir kişisel veri'), findsOneWidget);
+      expect(find.text(contactEmail), findsOneWidget);
+      expect(find.text(developerName), findsOneWidget);
+      // Ebeveyn adresi kopyalayabilmeli.
+      expect(find.byType(SelectableText), findsOneWidget);
+    });
+
+    testWidgets('küçük telefonda taşma yok', (tester) async {
+      // Uzun e-posta adresi dar ekranda satır sonuna sığmalı.
+      tester.view.physicalSize = const Size(720, 1280); // 360×640 dp
+      tester.view.devicePixelRatio = 2.0;
+      addTearDown(tester.view.reset);
+      expect(await tester.runAsync(gercekFontuYukle), isTrue);
+
+      await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+      await tester.pumpAndSettle();
+      await ayarlariAc(tester);
+      await hakkindayaKaydir(tester);
+
+      // Taşma olsaydı Flutter bir exception fırlatırdı.
+      expect(tester.takeException(), isNull);
+      expect(find.text(contactEmail), findsOneWidget);
+    });
   });
 }

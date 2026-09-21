@@ -7,3 +7,9 @@
 ///
 /// Not: "Keşif" değil "Kesif" — ş'siz yazım bilinçli bir tercih.
 const appName = 'Mini Kesif';
+
+/// Geliştirici etiketi (uygulama ikonundaki etiketle aynı).
+const developerName = 'IY Labs';
+
+/// Ebeveynlerin ulaşabileceği iletişim adresi (Ayarlar › Hakkında).
+const contactEmail = 'ibrahimyasar68@hotmail.com';
