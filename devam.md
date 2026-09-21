@@ -1,6 +1,6 @@
 # MiniKesif — Devam Notu
 
-> Son güncelleme: 2026-09-14 · Son commit: `0353f7a` (PHASE 25.1)
+> Son güncelleme: 2026-09-21 · Son commit: `a9b3b14` (PHASE 25.2)
 > Bu not, projeye ara verdikten sonra kaldığın yerden devam edebilmen için
 > hazırlandı. Yeni bir oturumda önce bu dosyayı ve `CLAUDE.md`'yi oku.
 
@@ -21,7 +21,7 @@
 | Flutter | 3.35.6 stable, Dart SDK ^3.9.2 |
 | Paketler | `provider`, `flutter_tts`, `shared_preferences` (+ `cupertino_icons`) |
 | İçerik | 3 bölüm × 10 soru = 30 soru |
-| Testler | 26 test dosyası, **188 test** (hepsi geçiyor) |
+| Testler | 26 test dosyası, **190 test** (hepsi geçiyor) |
 | Hedef | Play Store'da yayınlamak |
 
 **Çalışma şekli** (`CLAUDE.md`): Kodu AI yazar. Proje safha safha ilerler;
@@ -63,7 +63,7 @@ Service (AudioService) + Data (question_data)
 
 | Dosya | Görevi |
 |---|---|
-| `lib/app_info.dart` | Uygulama adı sabiti (`appName`) |
+| `lib/app_info.dart` | Ad, geliştirici (`IY Labs`), iletişim e-postası sabitleri |
 | `lib/main.dart` | Açılışta ayarları yükler, 3 provider'ı kurar, temayı bağlar |
 | `lib/models/question.dart` | Soru: metin, sesli metin, seçenekler, doğru cevap |
 | `lib/models/answer_option.dart` | Seçenek: id, etiket, emoji |
@@ -77,7 +77,7 @@ Service (AudioService) + Data (question_data)
 | `lib/pages/home_page.dart` | Bölüm seçimi, yıldızlar, Türkçe ses uyarısı, ⚙️ |
 | `lib/pages/game_page.dart` | Soru ekranı |
 | `lib/pages/result_page.dart` | Sonuç, yıldızlar, rekor |
-| `lib/pages/settings_page.dart` | Ses, tema, ilerlemeyi sıfırlama |
+| `lib/pages/settings_page.dart` | Ses, tema, ilerlemeyi sıfırlama, Hakkında |
 | `lib/widgets/answer_card.dart` | Tek seçenek kartı (animasyon, erişilebilirlik) |
 | `lib/widgets/answer_grid.dart` | 2–3 seçenek tek sıra, 4 seçenek 2×2, sabit yükseklik |
 | `lib/widgets/parent_gate_button.dart` | 2 sn basılı tutarak açılan ebeveyn kilidi |
@@ -124,6 +124,7 @@ Diğer klasörler:
 | 24.1 | İkona "IY Labs" etiketi | `a0e89b7` |
 | 25 | Yayına hazırlık: ad, kimlik, imza altyapısı, belgeler (**kısmen**) | `f1fb5b6` |
 | 25.1 | Ad tutarsızlığı: her yerde `Mini Kesif`, sabit + manifest testi | `0353f7a` |
+| 25.2 | Ayarlar › Hakkında: açıklama, gizlilik özeti, e-posta, IY Labs | `a9b3b14` |
 
 Her commit mesajında o safhanın ayrıntılı açıklaması var:
 `git log` ile okunabilir.
@@ -259,7 +260,7 @@ ekranı, arka plan müziği ve müzik ayarı.
 ## 7. Kaldığın yerden devam etmek için
 
 1. Bu dosyayı ve `CLAUDE.md`'yi oku.
-2. `flutter test` ile 186 testin geçtiğini doğrula.
+2. `flutter test` ile 190 testin geçtiğini doğrula.
 3. Sıradaki iş: **6.1** (imza anahtarı). Anahtar oluşturulmadan
    Play Store dosyası derlenemez. Görsellerle ilerlemek istersen önce
    **6.2**'deki görsel kaynağı kararını ver.
