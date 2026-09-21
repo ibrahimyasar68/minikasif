@@ -1,6 +1,6 @@
 # MiniKesif — Devam Notu
 
-> Son güncelleme: 2026-09-21 · Son commit: `a9b3b14` (PHASE 25.2)
+> Son güncelleme: 2026-09-21 · Son commit: `29abde7` (PHASE 25.3)
 > Bu not, projeye ara verdikten sonra kaldığın yerden devam edebilmen için
 > hazırlandı. Yeni bir oturumda önce bu dosyayı ve `CLAUDE.md`'yi oku.
 
@@ -21,7 +21,7 @@
 | Flutter | 3.35.6 stable, Dart SDK ^3.9.2 |
 | Paketler | `provider`, `flutter_tts`, `shared_preferences` (+ `cupertino_icons`) |
 | İçerik | 3 bölüm × 10 soru = 30 soru |
-| Testler | 26 test dosyası, **190 test** (hepsi geçiyor) |
+| Testler | 27 test dosyası, **196 test** (hepsi geçiyor) |
 | Hedef | Play Store'da yayınlamak |
 
 **Çalışma şekli** (`CLAUDE.md`): Kodu AI yazar. Proje safha safha ilerler;
@@ -93,6 +93,7 @@ Diğer klasörler:
 | `docs/play_store_hazirlik.md` | Play Store yayın kontrol listesi |
 | `docs/gizlilik_politikasi.md` | Gizlilik politikası taslağı |
 | `android/key.properties.example` | İmza bilgisi şablonu (parolasız) |
+| `test/yatay_ekran_test.dart` | Pixel 6 yatayda her ekran kaydırmadan görünür mü |
 | `test/app_adi_test.dart` | Launcher adı ile uygulama içi ad eşit mi |
 | `test/helpers/oyun.dart` | Cevapları veriden okuyan ortak test adımları |
 | `test/helpers/gercek_font.dart` | Yerleşim testleri için gerçek Roboto fontu |
@@ -125,6 +126,7 @@ Diğer klasörler:
 | 25 | Yayına hazırlık: ad, kimlik, imza altyapısı, belgeler (**kısmen**) | `f1fb5b6` |
 | 25.1 | Ad tutarsızlığı: her yerde `Mini Kesif`, sabit + manifest testi | `0353f7a` |
 | 25.2 | Ayarlar › Hakkında: açıklama, gizlilik özeti, e-posta, IY Labs | `a9b3b14` |
+| 25.3 | Yatay ekran: ana sayfa, oyun, sonuç iki sütun; ayarlar ortalı | `29abde7` |
 
 Her commit mesajında o safhanın ayrıntılı açıklaması var:
 `git log` ile okunabilir.
@@ -162,6 +164,13 @@ Tekrar düşmemek için bilinmesi gerekenler.
 - Ekran çizilirken (`initState`) `notifyListeners()` tetiklemek
   "setState() or markNeedsBuild() called during build" hatası verir.
   Rekor bu yüzden `GamePage`'in dinleyicisinde kaydediliyor.
+- **Yatay ekran:** sayfalar `maxWidth > maxHeight` ise iki sütuna geçer
+  (karar `LayoutBuilder` kısıtlarıyla, telefon yönüyle değil). Kare ya da
+  geniş bir test ekranı da yatay sayılır; dikey düzeni ölçen testler
+  dikey bir ekran kurmalı.
+- Emülatörü yan çevirmek: `adb shell wm user-rotation lock 1`
+  (geri almak: `lock 0`, ardından `free`; bu otomatik döndürmeyi açar,
+  gerekirse `settings put system accelerometer_rotation 0`).
 - Flutter, Gradle uyarılarını ekranda göstermez. Önemli durumlar hata
   olarak verilmeli.
 
@@ -260,7 +269,7 @@ ekranı, arka plan müziği ve müzik ayarı.
 ## 7. Kaldığın yerden devam etmek için
 
 1. Bu dosyayı ve `CLAUDE.md`'yi oku.
-2. `flutter test` ile 190 testin geçtiğini doğrula.
+2. `flutter test` ile 196 testin geçtiğini doğrula.
 3. Sıradaki iş: **6.1** (imza anahtarı). Anahtar oluşturulmadan
    Play Store dosyası derlenemez. Görsellerle ilerlemek istersen önce
    **6.2**'deki görsel kaynağı kararını ver.
