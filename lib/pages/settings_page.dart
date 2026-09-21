@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,6 +15,9 @@ import '../theme/app_colors.dart';
 /// kurulu; burada ise açıklayıcı metinler var.
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
+
+  /// İçeriğin en fazla genişliği (yatay ekran, tablet).
+  static const _enGenis = 600.0;
 
   /// Silme geri alınamaz: önce sor.
   Future<void> _sifirlamayiSor(BuildContext context) async {
@@ -55,107 +60,115 @@ class SettingsPage extends StatelessWidget {
         title: const Text('Ayarlar'),
       ),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            const _Baslik('Ses'),
-            Card(
-              color: renk.surface,
-              child: SwitchListTile(
-                secondary: Icon(
-                  ayarlar.sesAcik
-                      ? Icons.volume_up_rounded
-                      : Icons.volume_off_rounded,
-                  color: renk.primary,
-                  size: 32,
+        child: LayoutBuilder(
+          builder: (context, kisit) => ListView(
+            // Yatay ekranda / tablette kartlar bütün genişliğe yayılmasın:
+            // içerik en fazla 600 px, ortada. ListView'u daraltmak yerine yan
+            // boşluğu büyütüyoruz; böylece kenarlardan da kaydırılabiliyor.
+            padding: EdgeInsets.symmetric(
+              vertical: 16,
+              horizontal: math.max(16, (kisit.maxWidth - _enGenis) / 2),
+            ),
+            children: [
+              const _Baslik('Ses'),
+              Card(
+                color: renk.surface,
+                child: SwitchListTile(
+                  secondary: Icon(
+                    ayarlar.sesAcik
+                        ? Icons.volume_up_rounded
+                        : Icons.volume_off_rounded,
+                    color: renk.primary,
+                    size: 32,
+                  ),
+                  title: Text(
+                    'Sesli okuma',
+                    style: TextStyle(fontSize: 20, color: renk.text),
+                  ),
+                  subtitle: Text(
+                    ayarlar.sesAcik
+                        ? 'Sorular ve geri bildirimler sesli okunur'
+                        : 'Uygulama sessiz çalışır',
+                    style: TextStyle(color: renk.textMuted),
+                  ),
+                  value: ayarlar.sesAcik,
+                  onChanged: (acik) {
+                    context.read<SettingsProvider>().sesiAyarla(acik);
+                    // Kapatınca o an süren bir konuşma varsa hemen kes.
+                    if (!acik) context.read<GameProvider>().leave();
+                  },
                 ),
-                title: Text(
-                  'Sesli okuma',
-                  style: TextStyle(fontSize: 20, color: renk.text),
+              ),
+              const SizedBox(height: 24),
+              const _Baslik('Tema'),
+              Card(
+                color: renk.surface,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  // SegmentedButton: birden fazla seçenekten tam olarak BİRİ
+                  // seçili. Üç tema için ideal; radyo düğmelerinden daha kompakt.
+                  child: SegmentedButton<ThemeMode>(
+                    segments: const [
+                      ButtonSegment(
+                        value: ThemeMode.light,
+                        label: Text('Açık'),
+                        icon: Icon(Icons.light_mode_rounded),
+                      ),
+                      ButtonSegment(
+                        value: ThemeMode.dark,
+                        label: Text('Koyu'),
+                        icon: Icon(Icons.dark_mode_rounded),
+                      ),
+                      ButtonSegment(
+                        value: ThemeMode.system,
+                        label: Text('Sistem'),
+                        icon: Icon(Icons.brightness_auto_rounded),
+                      ),
+                    ],
+                    selected: {ayarlar.temaModu},
+                    onSelectionChanged: (secim) => context
+                        .read<SettingsProvider>()
+                        .temayiAyarla(secim.first),
+                  ),
                 ),
-                subtitle: Text(
-                  ayarlar.sesAcik
-                      ? 'Sorular ve geri bildirimler sesli okunur'
-                      : 'Uygulama sessiz çalışır',
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                child: Text(
+                  '"Sistem" seçiliyken telefonun açık/koyu ayarına uyulur.',
                   style: TextStyle(color: renk.textMuted),
                 ),
-                value: ayarlar.sesAcik,
-                onChanged: (acik) {
-                  context.read<SettingsProvider>().sesiAyarla(acik);
-                  // Kapatınca o an süren bir konuşma varsa hemen kes.
-                  if (!acik) context.read<GameProvider>().leave();
-                },
               ),
-            ),
-            const SizedBox(height: 24),
-            const _Baslik('Tema'),
-            Card(
-              color: renk.surface,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                // SegmentedButton: birden fazla seçenekten tam olarak BİRİ
-                // seçili. Üç tema için ideal; radyo düğmelerinden daha kompakt.
-                child: SegmentedButton<ThemeMode>(
-                  segments: const [
-                    ButtonSegment(
-                      value: ThemeMode.light,
-                      label: Text('Açık'),
-                      icon: Icon(Icons.light_mode_rounded),
-                    ),
-                    ButtonSegment(
-                      value: ThemeMode.dark,
-                      label: Text('Koyu'),
-                      icon: Icon(Icons.dark_mode_rounded),
-                    ),
-                    ButtonSegment(
-                      value: ThemeMode.system,
-                      label: Text('Sistem'),
-                      icon: Icon(Icons.brightness_auto_rounded),
-                    ),
-                  ],
-                  selected: {ayarlar.temaModu},
-                  onSelectionChanged: (secim) => context
-                      .read<SettingsProvider>()
-                      .temayiAyarla(secim.first),
+              const SizedBox(height: 24),
+              const _Baslik('İlerleme'),
+              Card(
+                color: renk.surface,
+                child: ListTile(
+                  leading: Icon(
+                    Icons.restart_alt_rounded,
+                    color: ilerlemeBos ? renk.textMuted : renk.primary,
+                    size: 32,
+                  ),
+                  title: Text(
+                    'İlerlemeyi sıfırla',
+                    style: TextStyle(fontSize: 20, color: renk.text),
+                  ),
+                  subtitle: Text(
+                    ilerlemeBos
+                        ? 'Henüz kazanılmış yıldız yok'
+                        : 'Bütün bölümlerin yıldızları silinir',
+                    style: TextStyle(color: renk.textMuted),
+                  ),
+                  // Silinecek bir şey yoksa buton pasif.
+                  enabled: !ilerlemeBos,
+                  onTap: () => _sifirlamayiSor(context),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-              child: Text(
-                '"Sistem" seçiliyken telefonun açık/koyu ayarına uyulur.',
-                style: TextStyle(color: renk.textMuted),
-              ),
-            ),
-            const SizedBox(height: 24),
-            const _Baslik('İlerleme'),
-            Card(
-              color: renk.surface,
-              child: ListTile(
-                leading: Icon(
-                  Icons.restart_alt_rounded,
-                  color: ilerlemeBos ? renk.textMuted : renk.primary,
-                  size: 32,
-                ),
-                title: Text(
-                  'İlerlemeyi sıfırla',
-                  style: TextStyle(fontSize: 20, color: renk.text),
-                ),
-                subtitle: Text(
-                  ilerlemeBos
-                      ? 'Henüz kazanılmış yıldız yok'
-                      : 'Bütün bölümlerin yıldızları silinir',
-                  style: TextStyle(color: renk.textMuted),
-                ),
-                // Silinecek bir şey yoksa buton pasif.
-                enabled: !ilerlemeBos,
-                onTap: () => _sifirlamayiSor(context),
-              ),
-            ),
-            const SizedBox(height: 24),
-            const _Baslik('Hakkında'),
-            const _Hakkinda(),
-          ],
+              const SizedBox(height: 24),
+              const _Baslik('Hakkında'),
+              const _Hakkinda(),
+            ],
+          ),
         ),
       ),
     );

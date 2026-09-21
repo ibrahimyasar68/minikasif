@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import 'package:provider/provider.dart';
+import '../models/game_section.dart';
 import '../providers/game_provider.dart';
 import 'game_page.dart';
 
@@ -75,112 +76,165 @@ class _ResultPageState extends State<ResultPage> {
           automaticallyImplyLeading: false,
         ),
         body: SafeArea(
-          // Center şart: Scaffold gövdeye gevşek genişlik kısıtı verir,
-          // Column büzülüp sola yapışır (bkz. test/layout_test.dart).
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('🎉', style: TextStyle(fontSize: 88)),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Tebrikler!',
-                    style: TextStyle(
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold,
-                      color: renk.success,
-                    ),
-                  ),
+          child: LayoutBuilder(
+            builder: (context, kisit) {
+              final bilgi = _bilgi(
+                renk,
+                game.starCount,
+                game.firstTryCount,
+                game.totalQuestions,
+              );
+              final butonlar = _butonlar(context, renk, sonrakiBolum);
 
-                  const SizedBox(height: 20),
-
-                  // Skoru rakamla değil yıldızla gösteriyoruz:
-                  // hedef kitle okuyamıyor.
-                  Wrap(
-                    spacing: 8,
-                    alignment: WrapAlignment.center,
-                    children: [
-                      for (var i = 0; i < 3; i++)
-                        Icon(
-                          i < game.starCount ? Icons.star : Icons.star_border,
-                          size: 56,
-                          color: renk.star,
+              // Yatay: kutlama solda, butonlar sağda. Alt alta dizilince
+              // butonlar ekranın altında kalıyordu (bkz. GamePage).
+              if (kisit.maxWidth > kisit.maxHeight) {
+                return Row(
+                  children: [
+                    Expanded(
+                      // FittedBox: yer darsa kutlama bilgisi taşmak veya
+                      // kaydırılmak yerine biraz küçülür. Burada dokunulacak
+                      // bir şey yok; küçülmesi sorun değil.
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: SizedBox(width: 340, child: bilgi),
                         ),
-                    ],
-                  ),
-
-                  if (widget.yeniRekor) ...[
-                    const SizedBox(height: 12),
-
-                    Text(
-                      'Yeni rekor! 🏆',
-
-                      style: TextStyle(
-                        fontSize: 28,
-
-                        fontWeight: FontWeight.bold,
-
-                        color: renk.primaryDark,
+                      ),
+                    ),
+                    Expanded(
+                      child: Center(
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.all(16),
+                          child: butonlar,
+                        ),
                       ),
                     ),
                   ],
+                );
+              }
 
-                  const SizedBox(height: 12),
-
-                  // Bu satır ÇOCUK için değil, ebeveyn için.
-                  // Küçük ve sade tutuyoruz ki ekranı kalabalıklaştırmasın.
-                  Text(
-                    '${game.totalQuestions} sorudan ${game.firstTryCount} tanesini '
-                    'ilk denemede bildin',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 18, color: renk.textMuted),
+              // Center şart: Scaffold gövdeye gevşek genişlik kısıtı verir,
+              // Column büzülüp sola yapışır (bkz. test/layout_test.dart).
+              return Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [bilgi, const SizedBox(height: 36), butonlar],
                   ),
-
-                  const SizedBox(height: 36),
-
-                  _SonucButonu(
-                    etiket: 'Tekrar oyna',
-                    emoji: '🔁',
-                    renk: renk.primary,
-                    onTap: () {
-                      context.read<GameProvider>().restart();
-                      _oyunaGit();
-                    },
-                  ),
-
-                  // Sonraki bölüm SADECE varsa gösterilir.
-                  // Son bölümdeysek bu buton hiç oluşturulmaz.
-                  if (sonrakiBolum != null) ...[
-                    const SizedBox(height: 16),
-                    _SonucButonu(
-                      etiket: sonrakiBolum.title,
-                      emoji: sonrakiBolum.emoji,
-                      renk: renk.successLight,
-                      onTap: () {
-                        context.read<GameProvider>().startSection(sonrakiBolum);
-                        _oyunaGit();
-                      },
-                    ),
-                  ],
-
-                  const SizedBox(height: 16),
-
-                  _SonucButonu(
-                    etiket: 'Ana sayfa',
-                    emoji: '🏠',
-                    renk: renk.neutral,
-                    // popUntil: ilk sayfaya kadar tüm sayfaları kapatır.
-                    onTap: () =>
-                        Navigator.popUntil(context, (route) => route.isFirst),
-                  ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),
+    );
+  }
+
+  /// Kutlama, yıldızlar, rekor ve ebeveyn için özet.
+  Widget _bilgi(AppColors renk, int yildiz, int ilkDenemede, int toplam) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text('🎉', style: TextStyle(fontSize: 88)),
+        const SizedBox(height: 12),
+        Text(
+          'Tebrikler!',
+          style: TextStyle(
+            fontSize: 40,
+            fontWeight: FontWeight.bold,
+            color: renk.success,
+          ),
+        ),
+
+        const SizedBox(height: 20),
+
+        // Skoru rakamla değil yıldızla gösteriyoruz:
+        // hedef kitle okuyamıyor.
+        Wrap(
+          spacing: 8,
+          alignment: WrapAlignment.center,
+          children: [
+            for (var i = 0; i < 3; i++)
+              Icon(
+                i < yildiz ? Icons.star : Icons.star_border,
+                size: 56,
+                color: renk.star,
+              ),
+          ],
+        ),
+
+        if (widget.yeniRekor) ...[
+          const SizedBox(height: 12),
+          Text(
+            'Yeni rekor! 🏆',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: renk.primaryDark,
+            ),
+          ),
+        ],
+
+        const SizedBox(height: 12),
+
+        // Bu satır ÇOCUK için değil, ebeveyn için.
+        // Küçük ve sade tutuyoruz ki ekranı kalabalıklaştırmasın.
+        Text(
+          '$toplam sorudan $ilkDenemede tanesini ilk denemede bildin',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 18, color: renk.textMuted),
+        ),
+      ],
+    );
+  }
+
+  /// Tekrar oyna, (varsa) sonraki bölüm, ana sayfa.
+  Widget _butonlar(
+    BuildContext context,
+    AppColors renk,
+    GameSection? sonrakiBolum,
+  ) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _SonucButonu(
+          etiket: 'Tekrar oyna',
+          emoji: '🔁',
+          renk: renk.primary,
+          onTap: () {
+            context.read<GameProvider>().restart();
+            _oyunaGit();
+          },
+        ),
+
+        // Sonraki bölüm SADECE varsa gösterilir.
+        // Son bölümdeysek bu buton hiç oluşturulmaz.
+        if (sonrakiBolum != null) ...[
+          const SizedBox(height: 16),
+          _SonucButonu(
+            etiket: sonrakiBolum.title,
+            emoji: sonrakiBolum.emoji,
+            renk: renk.successLight,
+            onTap: () {
+              context.read<GameProvider>().startSection(sonrakiBolum);
+              _oyunaGit();
+            },
+          ),
+        ],
+
+        const SizedBox(height: 16),
+
+        _SonucButonu(
+          etiket: 'Ana sayfa',
+          emoji: '🏠',
+          renk: renk.neutral,
+          // popUntil: ilk sayfaya kadar tüm sayfaları kapatır.
+          onTap: () => Navigator.popUntil(context, (route) => route.isFirst),
+        ),
+      ],
     );
   }
 }

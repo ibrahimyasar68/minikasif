@@ -106,21 +106,35 @@ class _GamePageState extends State<GamePage> {
           title: Text('Soru ${game.questionNumber} / ${game.totalQuestions}'),
         ),
         body: SafeArea(
-          // Küçük ekranda veya büyük yazı tipi ayarında içerik sığmayabilir.
-          // Taşma yerine kaydırma istiyoruz.
-          //
-          // Kalıp şu: SingleChildScrollView içeriği serbest bırakır,
-          // ConstrainedBox ise "en az ekran kadar uzun ol" der.
-          // Böylece içerik kısaysa Center ortalar, uzunsa kaydırılır.
           child: LayoutBuilder(
             builder: (context, kisit) {
+              // Yatay ekran: alt alta dizilince kartlar ekranın altında
+              // kalıyordu. Soru solda, kartlar sağda.
+              //
+              // Neden MediaQuery.orientationOf değil de kısıtlar?
+              // Bölünmüş ekranda telefon dik dururken bile uygulamaya ayrılan
+              // alan yatay olabilir. Belirleyici olan telefonun yönü değil,
+              // bu sayfaya kalan alanın şekli.
+              if (kisit.maxWidth > kisit.maxHeight) {
+                return const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: _QuestionView(yatay: true),
+                );
+              }
+
+              // Küçük ekranda veya büyük yazı tipi ayarında içerik
+              // sığmayabilir. Taşma yerine kaydırma istiyoruz.
+              //
+              // Kalıp şu: SingleChildScrollView içeriği serbest bırakır,
+              // ConstrainedBox ise "en az ekran kadar uzun ol" der.
+              // Böylece içerik kısaysa Center ortalar, uzunsa kaydırılır.
               return SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: kisit.maxHeight - 40),
                   // Center yatay ortalama için de şart
                   // (bkz. test/layout_test.dart).
-                  child: const Center(child: _QuestionView()),
+                  child: const Center(child: _QuestionView(yatay: false)),
                 ),
               );
             },
@@ -136,7 +150,10 @@ class _GamePageState extends State<GamePage> {
 /// Ayrı bir widget'a aldım çünkü GamePage.build'i uzuyordu.
 /// Alt çizgi ile başlıyor: sadece bu dosyada kullanılıyor.
 class _QuestionView extends StatelessWidget {
-  const _QuestionView();
+  const _QuestionView({required this.yatay});
+
+  /// true: soru solda, kartlar sağda. false: hepsi alt alta.
+  final bool yatay;
 
   /// Bir seçeneğin kartı hangi durumda görünmeli?
   /// Bu bir GÖRÜNÜM kararı, o yüzden provider'da değil burada.
@@ -161,6 +178,51 @@ class _QuestionView extends StatelessWidget {
     final question = game.currentQuestion;
     final sesAcik = context.select<SettingsProvider, bool>((a) => a.sesAcik);
 
+    final soruMetni = Text(
+      question.questionText,
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: 32,
+        fontWeight: FontWeight.bold,
+        color: renk.primaryDark,
+      ),
+    );
+
+    // Soruyu tekrar dinle.
+    // Çocuk sesi kaçırabilir veya tekrar duymak isteyebilir.
+    // Okuma yazma gerektirmeyen tek erişim yolu bu.
+    // Türkçe ses yoksa bu buton hiçbir şey yapmaz; hiç göstermiyoruz.
+    // İşe yaramayan bir buton çocuğun kafasını karıştırır.
+    final tekrarDinle = sesAcik && game.turkceSesVar != false
+        ? IconButton(
+            onPressed: () => context.read<GameProvider>().repeatQuestion(),
+            icon: const Icon(Icons.volume_up_rounded),
+            iconSize: 48,
+            color: renk.primary,
+            tooltip: 'Tekrar dinle',
+          )
+        : null;
+
+    final kartlar = AnswerGrid(
+      options: question.options,
+      statusOf: (option) => _statusFor(game, option),
+      onTap: game.isAnswered
+          ? null
+          : (option) => context.read<GameProvider>().answer(option),
+    );
+
+    // Doğru cevaptan sonra buton YOK: övgü bitince sonraki soruya
+    // kendiliğinden geçiliyor (GameProvider._scheduleAdvance).
+    final geriBildirim = Text(
+      _feedbackText(game),
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: 26,
+        fontWeight: FontWeight.bold,
+        color: game.isAnswered ? renk.success : renk.textMuted,
+      ),
+    );
+
     // AnimatedSwitcher: child'ın KEY'i değişince eskiyi soldurup
     // yeniyi belirtir. Anahtar soru id'si olduğu için:
     //   - soru değişince  -> geçiş animasyonu
@@ -168,60 +230,49 @@ class _QuestionView extends StatelessWidget {
     // Böylece her dokunuşta ekran titremiyor.
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 320),
-      child: Column(
-        key: ValueKey(question.id),
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            question.questionText,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: renk.primaryDark,
+      child: yatay
+          ? Row(
+              key: ValueKey(question.id),
+              children: [
+                // Sol: soru, tekrar dinle, geri bildirim.
+                // Normalde rahatça sığıyor; kaydırma yalnızca telefonda
+                // "büyük yazı" ayarı açıkken devreye giren bir yedek.
+                Expanded(
+                  flex: 2,
+                  child: Center(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          soruMetni,
+                          const SizedBox(height: 8),
+                          ?tekrarDinle,
+                          const SizedBox(height: 16),
+                          geriBildirim,
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                // Sağ: kartlar. Yükseklik burada SINIRLI; AnswerGrid kart
+                // boyutunu ekrana sığacak şekilde küçültür.
+                Expanded(flex: 3, child: Center(child: kartlar)),
+              ],
+            )
+          : Column(
+              key: ValueKey(question.id),
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                soruMetni,
+                const SizedBox(height: 12),
+                ?tekrarDinle,
+                const SizedBox(height: 20),
+                kartlar,
+                const SizedBox(height: 32),
+                geriBildirim,
+              ],
             ),
-          ),
-
-          const SizedBox(height: 12),
-
-          // Soruyu tekrar dinle.
-          // Çocuk sesi kaçırabilir veya tekrar duymak isteyebilir.
-          // Okuma yazma gerektirmeyen tek erişim yolu bu.
-          // Türkçe ses yoksa bu buton hiçbir şey yapmaz; hiç göstermiyoruz.
-          // İşe yaramayan bir buton çocuğun kafasını karıştırır.
-          if (sesAcik && game.turkceSesVar != false)
-            IconButton(
-              onPressed: () => context.read<GameProvider>().repeatQuestion(),
-              icon: const Icon(Icons.volume_up_rounded),
-              iconSize: 48,
-              color: renk.primary,
-              tooltip: 'Tekrar dinle',
-            ),
-
-          const SizedBox(height: 20),
-
-          AnswerGrid(
-            options: question.options,
-            statusOf: (option) => _statusFor(game, option),
-            onTap: game.isAnswered
-                ? null
-                : (option) => context.read<GameProvider>().answer(option),
-          ),
-
-          const SizedBox(height: 32),
-
-          // Doğru cevaptan sonra buton YOK: övgü bitince sonraki soruya
-          // kendiliğinden geçiliyor (GameProvider._scheduleAdvance).
-          Text(
-            _feedbackText(game),
-            style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: game.isAnswered ? renk.success : renk.textMuted,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

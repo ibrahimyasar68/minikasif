@@ -26,6 +26,16 @@ class ParentGateButton extends StatefulWidget {
   /// Ne kadar basılı tutulmalı.
   final Duration holdDuration;
 
+  /// Butonun kenar uzunluğu.
+  static const boyut = 56.0;
+
+  /// Ekran köşesinden ne kadar içeride duruyor (bkz. HomePage).
+  static const kenarBoslugu = 4.0;
+
+  /// Köşede kapladığı toplam alan. Yanına gelecek içerik bu kadar
+  /// boşluk bırakmalı ki simgenin altına girmesin.
+  static const alan = boyut + 2 * kenarBoslugu;
+
   @override
   State<ParentGateButton> createState() => _ParentGateButtonState();
 }
@@ -114,8 +124,8 @@ class _ParentGateButtonState extends State<ParentGateButton>
         onPointerUp: (_) => _birakildi(),
         onPointerCancel: (_) => _iptal(),
         child: SizedBox(
-          width: 56,
-          height: 56,
+          width: ParentGateButton.boyut,
+          height: ParentGateButton.boyut,
           // AnimatedBuilder: controller her tik attığında SADECE bu kısmı
           // yeniden çizer; ana sayfanın geri kalanı etkilenmez.
           child: AnimatedBuilder(

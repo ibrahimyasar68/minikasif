@@ -33,46 +33,28 @@ class HomePage extends StatelessWidget {
         // yerinden oynamasın (bölüm butonları kaydırmadan görünmeli).
         child: Stack(
           children: [
-            Center(
-              child: SingleChildScrollView(
-                // Küçük ekranlarda 3 bölüm kartı sığmayabilir.
-                // Taşma hatası yerine kaydırma.
-                padding: const EdgeInsets.symmetric(vertical: 24),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Sadece Türkçe ses KESİN yoksa (false). null = kontrol sürüyor.
-                    // Ses kapalıysa uyarı anlamsız: ebeveyn sessizliği seçmiş.
-                    if (sesAcik && turkceSesVar == false)
-                      const _TurkceSesUyarisi(),
-                    const Text('🔍', style: TextStyle(fontSize: 80)),
-                    const SizedBox(height: 8),
-                    Text(
-                      appName,
-                      style: TextStyle(
-                        fontSize: 44,
-                        fontWeight: FontWeight.bold,
-                        color: renk.primaryDark,
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-
-                    // GameSection.values enum'un tüm değerlerini verir.
-                    // Yeni bir bölüm eklersek bu ekran kendiliğinden günceller;
-                    // burada elle liste tutmuyoruz.
-                    for (final section in GameSection.values) ...[
-                      _SectionButton(section: section),
-                      const SizedBox(height: 20),
-                    ],
-                  ],
-                ),
-              ),
+            LayoutBuilder(
+              builder: (context, kisit) {
+                // Sadece Türkçe ses KESİN yoksa (false). null = kontrol
+                // sürüyor. Ses kapalıysa uyarı anlamsız: ebeveyn sessizliği
+                // seçmiş.
+                final uyari = sesAcik && turkceSesVar == false
+                    ? const _TurkceSesUyarisi()
+                    : null;
+                // Yatay: başlık solda, bölümler sağda. Alt alta dizilince
+                // yalnızca ilk bölüm görünüyordu (Pixel 6, yatay).
+                // Karar kısıtlara göre (bkz. GamePage): belirleyici olan
+                // bu sayfaya kalan alanın şekli.
+                return kisit.maxWidth > kisit.maxHeight
+                    ? _YatayGovde(uyari: uyari, yukseklik: kisit.maxHeight)
+                    : _DikeyGovde(uyari: uyari);
+              },
             ),
             // Ayarlar: ebeveyn için, köşede. 2 saniye basılı tutarak açılır;
             // çocuğun yanlışlıkla girmesini önler (ebeveyn kilidi).
             Positioned(
-              top: 4,
-              right: 4,
+              top: ParentGateButton.kenarBoslugu,
+              right: ParentGateButton.kenarBoslugu,
               child: ParentGateButton(
                 onOpen: () => Navigator.push(
                   context,
@@ -83,6 +65,133 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Logo ve uygulama adı. Yatayda biraz küçülür: yer dar.
+class _Baslik extends StatelessWidget {
+  const _Baslik({this.kucuk = false});
+  final bool kucuk;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Text('🔍', style: TextStyle(fontSize: kucuk ? 56 : 80)),
+      const SizedBox(height: 8),
+      Text(
+        appName,
+        style: TextStyle(
+          fontSize: 44,
+          fontWeight: FontWeight.bold,
+          color: AppColors.of(context).primaryDark,
+        ),
+      ),
+    ],
+  );
+}
+
+/// Dikey ekran: her şey alt alta.
+class _DikeyGovde extends StatelessWidget {
+  const _DikeyGovde({required this.uyari});
+
+  /// Türkçe ses uyarısı; gerekmiyorsa null.
+  final Widget? uyari;
+
+  @override
+  Widget build(BuildContext context) => Center(
+    child: SingleChildScrollView(
+      // Küçük ekranlarda 3 bölüm kartı sığmayabilir.
+      // Taşma hatası yerine kaydırma.
+      padding: const EdgeInsets.symmetric(vertical: 24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ?uyari,
+          const _Baslik(),
+          const SizedBox(height: 32),
+          // GameSection.values enum'un tüm değerlerini verir.
+          // Yeni bir bölüm eklersek bu ekran kendiliğinden günceller;
+          // burada elle liste tutmuyoruz.
+          for (final section in GameSection.values) ...[
+            _SectionButton(section: section),
+            const SizedBox(height: 20),
+          ],
+        ],
+      ),
+    ),
+  );
+}
+
+/// Yatay ekran: solda başlık (ve varsa uyarı), sağda bölüm butonları.
+class _YatayGovde extends StatelessWidget {
+  const _YatayGovde({required this.uyari, required this.yukseklik});
+
+  final Widget? uyari;
+
+  /// Sayfanın kullanılabilir yüksekliği.
+  final double yukseklik;
+
+  static const _dikeyBosluk = 16.0;
+  static const _araBosluk = 12.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final bolumSayisi = GameSection.values.length;
+    // Butonlar kullanılabilir yüksekliği paylaşır. Dikeydeki 110 px'i
+    // geçmez; 72 px'in altına da inmez (0-4 yaş için hâlâ çok büyük bir
+    // dokunma alanı). Daha azına yer yoksa sağ sütun kaydırılır.
+    final butonYuksekligi =
+        ((yukseklik - 2 * _dikeyBosluk - (bolumSayisi - 1) * _araBosluk) /
+                bolumSayisi)
+            .clamp(72.0, 110.0);
+
+    return Row(
+      children: [
+        // Sol: başlık. Uyarı bandı varsa o da burada; ebeveyn için olan
+        // bilgi solda, çocuğun dokunacağı butonlar sağda.
+        Expanded(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(vertical: _dikeyBosluk),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ?uyari,
+                  _Baslik(kucuk: uyari != null),
+                ],
+              ),
+            ),
+          ),
+        ),
+        // Sağ: bölümler. Sağ üstteki ayar simgesinin altına girmesin diye
+        // sağda simge genişliği kadar boşluk bırakılıyor.
+        Expanded(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(
+                8,
+                _dikeyBosluk,
+                ParentGateButton.alan,
+                _dikeyBosluk,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (final (i, section) in GameSection.values.indexed) ...[
+                    if (i > 0) const SizedBox(height: _araBosluk),
+                    _SectionButton(
+                      section: section,
+                      yukseklik: butonYuksekligi,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -155,7 +264,10 @@ class _TurkceSesUyarisi extends StatelessWidget {
 class _SectionButton extends StatelessWidget {
   final GameSection section;
 
-  const _SectionButton({required this.section});
+  /// Dikeyde 110; yatayda ekrana göre (bkz. _YatayGovde).
+  final double yukseklik;
+
+  const _SectionButton({required this.section, this.yukseklik = 110});
 
   @override
   Widget build(BuildContext context) {
@@ -165,73 +277,79 @@ class _SectionButton extends StatelessWidget {
       (p) => p.enIyi(section),
     );
 
-    return SizedBox(
-      width: 300,
-      height: 110,
-      child: ElevatedButton(
-        onPressed: () {
-          // Önce bölümü başlat (durumu sıfırlar), sonra ekranı aç.
-          context.read<GameProvider>().startSection(section);
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const GamePage()),
-          );
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: renk.surface,
-          foregroundColor: renk.primaryDark,
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
+    // ConstrainedBox: en fazla 300 px geniş. Dar bir sütunda (küçük
+    // telefon, yatay) sütuna sığacak kadar daralır; FittedBox da içeriği
+    // küçültür.
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 300),
+      child: SizedBox(
+        width: double.infinity,
+        height: yukseklik,
+        child: ElevatedButton(
+          onPressed: () {
+            // Önce bölümü başlat (durumu sıfırlar), sonra ekranı aç.
+            context.read<GameProvider>().startSection(section);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const GamePage()),
+            );
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: renk.surface,
+            foregroundColor: renk.primaryDark,
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(28),
+            ),
           ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(section.emoji, style: const TextStyle(fontSize: 52)),
-            const SizedBox(width: 20),
-            // FittedBox: içerik butona sığmazsa taşmak yerine küçülür.
-            // Başlık + yıldız satırı normalde sığıyor; ama telefonda "büyük
-            // yazı" ayarı açıksa başlık iki satıra bölünüp 110 px'lik
-            // butondan taşıyordu (testlerde yakalandı).
-            Flexible(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      section.title,
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(section.emoji, style: const TextStyle(fontSize: 52)),
+              const SizedBox(width: 20),
+              // FittedBox: içerik butona sığmazsa taşmak yerine küçülür.
+              // Başlık + yıldız satırı normalde sığıyor; ama telefonda "büyük
+              // yazı" ayarı açıksa başlık iki satıra bölünüp 110 px'lik
+              // butondan taşıyordu (testlerde yakalandı).
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        section.title,
+                        style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    // Ekran okuyucu yıldız simgelerini tek tek okumasın;
-                    // "2 / 3 yıldız" desin.
-                    Semantics(
-                      label: '$yildiz / 3 yıldız',
-                      excludeSemantics: true,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          for (var i = 0; i < 3; i++)
-                            Icon(
-                              i < yildiz ? Icons.star : Icons.star_border,
-                              size: 24,
-                              color: renk.star,
-                            ),
-                        ],
+                      const SizedBox(height: 2),
+                      // Ekran okuyucu yıldız simgelerini tek tek okumasın;
+                      // "2 / 3 yıldız" desin.
+                      Semantics(
+                        label: '$yildiz / 3 yıldız',
+                        excludeSemantics: true,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            for (var i = 0; i < 3; i++)
+                              Icon(
+                                i < yildiz ? Icons.star : Icons.star_border,
+                                size: 24,
+                                color: renk.star,
+                              ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

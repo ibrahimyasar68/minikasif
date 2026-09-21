@@ -17,6 +17,10 @@ import 'answer_card.dart';
 ///
 /// Kart boyutu sabit değil: mevcut genişliğe sığacak şekilde hesaplanıyor.
 /// Böylece dar ekranda taşma olmuyor, geniş ekranda gereksiz küçülmüyor.
+///
+/// Yükseklik sınırı verilirse (yatay ekran) kartlar o yüksekliğe de sığar.
+/// Dikey ekranda ızgara kaydırılabilir bir Column içinde durur; yükseklik
+/// sınırsızdır ve yalnızca genişlik belirleyicidir.
 class AnswerGrid extends StatelessWidget {
   final List<AnswerOption> options;
 
@@ -52,12 +56,24 @@ class AnswerGrid extends StatelessWidget {
     // hesaplıyoruz. Sabit boyut yazsaydık dar ekranda taşardı.
     return LayoutBuilder(
       builder: (context, kisit) {
-        final kullanilabilir = kisit.maxWidth - _bosluk * (sutun - 1);
-        // floorToDouble: küsurat yüzünden toplam genişlik maxWidth'i
-        // bir kıl payı aşıp kartlardan biri alt satıra düşmesin.
-        final boyut = (kullanilabilir / sutun)
-            .clamp(_enKucuk, _enBuyuk)
-            .floorToDouble();
+        // Kart alanı her zaman 2 sıralık yer ayırıyor (aşağıya bakın).
+        // Yükseklik sınırlıysa (yatay ekran) bir kart en fazla bu kadar
+        // olabilir. Sınırsızsa (dikey ekran) sonsuz: genişlik belirler.
+        final yukseklikBoyut = (kisit.maxHeight - _bosluk) / 2;
+
+        /// [sutunSayisi] kart yan yana sığacaksa bir kart en fazla kaç px?
+        /// floorToDouble: küsurat yüzünden toplam genişlik maxWidth'i
+        /// bir kıl payı aşıp kartlardan biri alt satıra düşmesin.
+        double kartBoyutu(int sutunSayisi) {
+          final genislikBoyut =
+              (kisit.maxWidth - _bosluk * (sutunSayisi - 1)) / sutunSayisi;
+          return math
+              .min(genislikBoyut, yukseklikBoyut)
+              .clamp(_enKucuk, _enBuyuk)
+              .floorToDouble();
+        }
+
+        final boyut = kartBoyutu(sutun);
 
         // Kart alanının YÜKSEKLİĞİ seçenek sayısından bağımsız.
         //
@@ -69,9 +85,7 @@ class AnswerGrid extends StatelessWidget {
         //
         // max(): çok dar ekranda 3 kart mecburen 2+1 dizilirse gerçek
         // yükseklik yine sığsın.
-        final ikiSutunBoyut = ((kisit.maxWidth - _bosluk) / 2)
-            .clamp(_enKucuk, _enBuyuk)
-            .floorToDouble();
+        final ikiSutunBoyut = kartBoyutu(2);
         final satir = (options.length / sutun).ceil();
         final sabitYukseklik = math.max(
           2 * ikiSutunBoyut + _bosluk,

@@ -15,15 +15,18 @@ import 'helpers/oyun.dart';
 /// Ekranda "içerik sola kaymış" gibi görünür ama hiçbir hata çıkmaz.
 /// Sessiz bir hata olduğu için test ile korunması şart.
 void main() {
-  /// GENİŞ bir ekran kuruyoruz (1200x1200 logical).
+  /// GENİŞ bir ekran kuruyoruz (1200x1600 logical).
   ///
   /// Neden telefon boyutu değil?
   /// Test ortamının varsayılan fontu her karakteri kare kutu olarak çizer,
   /// bu yüzden soru metni telefon genişliğinde ekranı zaten doldurur ve
   /// Column'un büzülmesi GÖRÜNMEZ - hata maskelenir.
   /// Geniş ekranda metin ekranı dolduramaz, büzülme açığa çıkar.
+  ///
+  /// Neden kare değil? Genişliği yüksekliğinden büyük alan YATAY düzene
+  /// geçer (bkz. test/yatay_ekran_test.dart). Burada dikey düzen ölçülüyor.
   void ekranAyarla(WidgetTester tester) {
-    tester.view.physicalSize = const Size(2400, 2400);
+    tester.view.physicalSize = const Size(2400, 3200);
     tester.view.devicePixelRatio = 2.0;
     addTearDown(tester.view.reset);
   }
