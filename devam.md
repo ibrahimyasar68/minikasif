@@ -1,6 +1,6 @@
 # MiniKesif — Devam Notu
 
-> Son güncelleme: 2026-09-22 · Son commit: `85a0586` (PHASE 25.7)
+> Son güncelleme: 2026-09-22 · Son commit: `93f0b25` (PHASE 25 - imzalı paket)
 > Bu not, projeye ara verdikten sonra kaldığın yerden devam edebilmen için
 > hazırlandı. Yeni bir oturumda önce bu dosyayı ve `CLAUDE.md`'yi oku.
 
@@ -136,6 +136,7 @@ Diğer klasörler:
 | 25.5 | Gizlilik politikası: e-posta ve tarih dolduruldu | `bb7221c` |
 | 25.6 | Soru geçişi: önce sön, sonra belir; geçişte dokunma kilidi | `43d645a` |
 | 25.7 | Mağaza görselleri, tanıtım görseli, derleme güvencesi | `85a0586` |
+| 25 (kalan) | İmza anahtarı, imzalı `.aab`, imza doğrulaması | `93f0b25` |
 
 Her commit mesajında o safhanın ayrıntılı açıklaması var:
 `git log` ile okunabilir.
@@ -207,42 +208,26 @@ Tekrar düşmemek için bilinmesi gerekenler.
 
 ## 6. Yapılması planlananlar
 
-### 6.1 PHASE 25'in kalanı — yayına hazırlık 🔄
+### 6.1 PHASE 25 — yayına hazırlık ✅ (AI tarafı bitti)
 
-Benim (AI) tarafım bitti. Sıradaki adım **senin**:
+İmza anahtarı hazır (`~/iylabs-keys/minikesif-upload.jks`, takma ad
+`upload`), `android/key.properties` dolu (git'e girmez), imzalı paket
+derlendi ve doğrulandı:
+`build/app/outputs/bundle/release/app-release.aab` (41,1 MB, sertifika
+sahibi `CN=Ibrahim YASAR`). Grafikler `design/magaza/` altında.
 
-1. **İmza anahtarını oluştur** (parolaları kendin gir, yedekle, AI'a yazma):
-   ```bash
-   mkdir -p ~/iylabs-keys
-   ```
-   ```bash
-   keytool -genkey -v -keystore ~/iylabs-keys/minikesif-upload.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
-   ```
-2. Şablonu kopyala, parolaları ve `storeFile` yolunu doldur:
-   ```bash
-   cp android/key.properties.example android/key.properties
-   ```
-3. `.jks` dosyasını ve parolaları güvenli bir yere yedekle. Bu bir
-   yükleme anahtarı: kaybolursa Play Console'dan sıfırlama istenebilir,
-   ama süreç zahmetli.
-4. AI'a **"anahtar hazır"** de.
+Yeni paket gerektiğinde: `flutter build appbundle --release`, ardından
+`keytool -printcert -jarfile ...` ile imza kontrolü. Her yüklemede
+`pubspec.yaml` içindeki sürümün `+` sonrası artmalı.
 
-Sonra AI'ın yapacakları:
-- İmzalı `.aab` derlemek ve imzanın debug olmadığını doğrulamak
-  (anahtar yokken `.aab` derlemesi bilerek hata veriyor; kalan eski
-  paketi de siliyor).
-
-Grafikler PHASE 25.7'de tamamlandı: `design/magaza/` altında 5 dikey +
-2 yatay ekran görüntüsü ve tanıtım görseli hazır.
-
-Senin yapacakların (ayrıntı: `docs/play_store_hazirlik.md`):
-- Gizlilik politikasını (`docs/gizlilik_politikasi.md`, e-posta ve tarih
-  dolu) herkese açık bir adreste yayınlamak.
+**Kalanlar senin (ayrıntı: `docs/play_store_hazirlik.md`):**
+- Gizlilik politikasını herkese açık bir adreste yayınlamak (metin hazır).
 - Play Console geliştirici hesabı.
 - Yeni kişisel hesaplarda yayından önce kapalı test (bilinen kural:
   12 test kullanıcısı, 14 gün; güncel şartı Play Console'da kontrol et).
 - Mağaza formları: hedef kitle 0–5 (Aileler Politikası), veri güvenliği
   ("veri toplanmıyor"), içerik derecelendirmesi.
+- `.jks` dosyasını ve parolaları yedeklemek.
 
 ### 6.2 PHASE 26 — Gerçek görseller ⬜
 
