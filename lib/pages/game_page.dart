@@ -165,6 +165,39 @@ class _QuestionView extends StatelessWidget {
     return AnswerStatus.normal;
   }
 
+  /// Soru geçişi: önce eski söner, SONRA yeni belirir.
+  ///
+  /// Varsayılan geçiş çapraz solmaydı: eski solarken yeni aynı anda
+  /// beliriyordu ve iki soru metni bir an iç içe görünüyordu.
+  ///
+  /// AnimatedSwitcher her çocuğa kendi animasyonunu verir:
+  ///   yeni gelen: 0 -> 1 (320 ms)
+  ///   giden     : 1 -> 0 (aynı süre, tersine)
+  /// Interval(0.5, 1.0) ikisinde de görünürlüğü animasyonun üst yarısına
+  /// sıkıştırır. Giden ilk 160 ms'de tamamen söner; gelen son 160 ms'de
+  /// belirir. Aynı anda ikisinin de görünür olduğu bir an yok.
+  ///
+  /// IgnorePointer: geçiş sürerken kartlar dokunmaya kapalı. Yoksa çocuk
+  /// henüz görünmeyen yeni karta (ya da sönen eski karta) dokunabilirdi.
+  static Widget _onceSonSonraBelir(Widget child, Animation<double> animasyon) {
+    return AnimatedBuilder(
+      animation: animasyon,
+      // child parametresi: FadeTransition her karede yeniden KURULMAZ;
+      // yalnızca IgnorePointer'ın değeri güncellenir.
+      child: FadeTransition(
+        opacity: CurvedAnimation(
+          parent: animasyon,
+          curve: const Interval(0.5, 1.0),
+        ),
+        child: child,
+      ),
+      builder: (context, solma) => IgnorePointer(
+        ignoring: animasyon.status != AnimationStatus.completed,
+        child: solma,
+      ),
+    );
+  }
+
   String _feedbackText(GameProvider game) {
     if (game.isAnswered) return 'Aferin! 🎉';
     if (game.hasWrongAttempt) return 'Tekrar dene 🙂';
@@ -230,6 +263,7 @@ class _QuestionView extends StatelessWidget {
     // Böylece her dokunuşta ekran titremiyor.
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 320),
+      transitionBuilder: _onceSonSonraBelir,
       child: yatay
           ? Row(
               key: ValueKey(question.id),
