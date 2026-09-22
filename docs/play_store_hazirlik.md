@@ -4,7 +4,17 @@ Kimlik: `com.iylabs.minikesif` · Sürüm: `1.0.0` (versionCode 1)
 
 İşaretler: 🧑 senin yapman gereken · 🤖 benim hazırladığım/hazırlayabileceğim
 
-## 1. İmza anahtarı 🧑
+## 1. İmza anahtarı 🧑 ✅
+
+Anahtar 22 Eylül 2026'da oluşturuldu: `~/iylabs-keys/minikesif-upload.jks`,
+takma ad `upload`, sertifika 2054'e kadar geçerli (Play en az 2033 istiyor).
+Yükleme sertifikasının SHA-256 parmak izi:
+
+```text
+7D:5C:D8:10:71:5B:70:99:1C:B4:72:42:C5:10:2A:64:85:32:10:44:A2:72:D0:CF:1F:DD:D0:1B:91:53:AF:CB
+```
+
+Anahtar ve parolalar git'e girmez; `.jks` dosyasını ve parolaları yedekle.
 
 Anahtar yoksa `.aab` derlemesi bilerek hata verir.
 
@@ -21,7 +31,12 @@ Anahtar yoksa `.aab` derlemesi bilerek hata verir.
    konum). Play App Signing sayesinde bu bir "yükleme anahtarı"dır: kaybolursa
    Play Console'dan sıfırlama istenebilir, ama süreç zahmetlidir.
 
-## 2. Derleme 🤖
+## 2. Derleme 🤖 ✅
+
+İlk imzalı paket 22 Eylül 2026'da derlendi ve doğrulandı: imza sahibi
+`CN=Ibrahim YASAR` (debug değil), `com.iylabs.minikesif`, versionCode 1,
+versionName 1.0.0, minSdk 24, targetSdk 36. Paket 41,1 MB; üç işlemci
+mimarisini birden taşıyor, cihaza inen parça ~17 MB (arm64).
 
 Anahtar hazır olduğunda (1. adım), proje kökünde:
 
