@@ -1,6 +1,6 @@
 # MiniKesif — Devam Notu
 
-> Son güncelleme: 2026-09-22 · Son commit: `43d645a` (PHASE 25.6)
+> Son güncelleme: 2026-09-22 · Son commit: `85a0586` (PHASE 25.7)
 > Bu not, projeye ara verdikten sonra kaldığın yerden devam edebilmen için
 > hazırlandı. Yeni bir oturumda önce bu dosyayı ve `CLAUDE.md`'yi oku.
 
@@ -90,6 +90,8 @@ Diğer klasörler:
 |---|---|
 | `tool/ikon_uret.py` | Uygulama ikonunu koddan üretir (Pillow) |
 | `design/ikon/` | 1024 px ana ikon, 512 px Play Store ikonu |
+| `design/magaza/` | Mağaza ekran görüntüleri ve 1024×500 tanıtım görseli |
+| `tool/tanitim_gorseli.py` | Tanıtım görselini koddan üretir |
 | `docs/play_store_hazirlik.md` | Play Store yayın kontrol listesi |
 | `docs/gizlilik_politikasi.md` | Gizlilik politikası taslağı |
 | `android/key.properties.example` | İmza bilgisi şablonu (parolasız) |
@@ -133,6 +135,7 @@ Diğer klasörler:
 | 25.4 | Döndürme kilidinden bağımsız otomatik döndürme (`sensor`) | `0a5c2c8` |
 | 25.5 | Gizlilik politikası: e-posta ve tarih dolduruldu | `bb7221c` |
 | 25.6 | Soru geçişi: önce sön, sonra belir; geçişte dokunma kilidi | `43d645a` |
+| 25.7 | Mağaza görselleri, tanıtım görseli, derleme güvencesi | `85a0586` |
 
 Her commit mesajında o safhanın ayrıntılı açıklaması var:
 `git log` ile okunabilir.
@@ -226,10 +229,11 @@ Benim (AI) tarafım bitti. Sıradaki adım **senin**:
 
 Sonra AI'ın yapacakları:
 - İmzalı `.aab` derlemek ve imzanın debug olmadığını doğrulamak
-  (anahtar yokken `.aab` derlemesi bilerek hata veriyor).
-- Ekran görüntüleri: Pixel 6 görüntüleri (1080×2400) Play'in 2:1
-  sınırını aşıyor, 1080×2160'a kırpılacak.
-- 1024×500 tanıtım görseli.
+  (anahtar yokken `.aab` derlemesi bilerek hata veriyor; kalan eski
+  paketi de siliyor).
+
+Grafikler PHASE 25.7'de tamamlandı: `design/magaza/` altında 5 dikey +
+2 yatay ekran görüntüsü ve tanıtım görseli hazır.
 
 Senin yapacakların (ayrıntı: `docs/play_store_hazirlik.md`):
 - Gizlilik politikasını (`docs/gizlilik_politikasi.md`, e-posta ve tarih
