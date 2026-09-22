@@ -79,10 +79,17 @@ android {
 // çalışılıyordu. .apk (telefonda denemek için) debug imzasıyla çalışmaya devam eder.
 gradle.taskGraph.whenReady {
     if (!releaseKeyVar && allTasks.any { it.name == "bundleRelease" }) {
+        // Önceki bir derlemeden kalan .aab varsa SİL. Derleme hata verse bile
+        // dosya yerinde kalıyordu; klasörde duran eski (debug imzalı) paket
+        // yanlışlıkla Play Console'a yüklenebilir. Bir kez yaşandı.
+        val eski = layout.buildDirectory
+            .file("outputs/bundle/release/app-release.aab").get().asFile
+        val silindi = eski.exists() && eski.delete()
         throw GradleException(
             "Play Store paketi (.aab) için imza anahtarı gerekli: " +
                 "android/key.properties bulunamadı. " +
-                "Şablon: android/key.properties.example"
+                "Şablon: android/key.properties.example" +
+                if (silindi) " (Önceki derlemeden kalan app-release.aab silindi.)" else ""
         )
     }
 }

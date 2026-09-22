@@ -23,12 +23,34 @@ Anahtar yoksa `.aab` derlemesi bilerek hata verir.
 
 ## 2. Derleme 🤖
 
+Anahtar hazır olduğunda (1. adım), proje kökünde:
+
+```bash
+flutter test
+```
+
 ```bash
 flutter build appbundle --release
 ```
 
-Çıktı: `build/app/outputs/bundle/release/app-release.aab`. İmzanın debug değil
-senin anahtarın olduğu doğrulanmalı.
+Çıktı: `build/app/outputs/bundle/release/app-release.aab`. Play Console'a
+yüklenecek dosya budur (`.apk` değil).
+
+**İmzayı doğrula.** Çıktıda `CN=Android Debug` YAZMAMALI; kendi adın/kurumun
+görünmeli:
+
+```bash
+keytool -printcert -jarfile build/app/outputs/bundle/release/app-release.aab
+```
+
+Notlar:
+- `key.properties` yoksa `.aab` derlemesi bilerek hata verir ve önceki
+  derlemeden kalan `app-release.aab` varsa siler. (Bir kez, güvence eklenmeden
+  önce derlenmiş debug imzalı bir paket klasörde kalmıştı; böyle bir dosya
+  yanlışlıkla yüklenebilir.)
+- Telefonda denemek için `.apk` yeterli ve anahtar gerektirmez:
+  `flutter build apk --release`.
+- Her yeni yüklemede `pubspec.yaml` içindeki sürümün `+` sonrası artmalı.
 
 ## 3. Play Console hesabı 🧑
 
@@ -67,8 +89,23 @@ Güvenli ve sade:
 | Öğe | Şart | Durum |
 |---|---|---|
 | Uygulama ikonu | 512×512 PNG | ✅ `design/ikon/play_store_512.png` |
-| Tanıtım görseli | 1024×500 | ⬜ 🤖 ikon betiğinden üretilebilir |
-| Telefon ekran görüntüleri | en az 2; uzun kenar kısa kenarın en fazla 2 katı | ⬜ Emülatör görüntüleri 1080×2400 (2,22 kat) — **sınırı aşıyor**, 1080×2160'a kırpılmalı 🤖 |
+| Tanıtım görseli | 1024×500 | ✅ `design/magaza/tanitim_1024x500.png` (`python3 tool/tanitim_gorseli.py`) |
+| Telefon ekran görüntüleri | en az 2; uzun kenar kısa kenarın en fazla 2 katı | ✅ `design/magaza/telefon_*.png` — 5 dikey (1080×2160) + 2 yatay (2160×1080), hepsi tam 2:1 |
+
+Ekran görüntüleri Pixel 6 emülatöründen alındı (1080×2400 = 2,22 kat; sınırı
+aşıyordu). Dikeylerde üstten ve alttan 120'şer piksel kırpıldı: hem oran 2:1
+oldu hem de durum çubuğu ile hareket çubuğu çıktı. Yataylarda soldaki kamera
+çentiği bandı kırpıldı.
+
+| Dosya | Ekran |
+|---|---|
+| `telefon_ana_sayfa.png` | Bölüm seçimi, kazanılan yıldızlar |
+| `telefon_soru_3secenek.png` | Soru ekranı, 3 seçenek |
+| `telefon_dogru_cevap.png` | Doğru cevap ve "Aferin!" |
+| `telefon_soru_4secenek.png` | 4 seçenekli soru (2×2) |
+| `telefon_sonuc.png` | Bölüm sonu, 3 yıldız |
+| `telefon_yatay_ana_sayfa.png` | Yatay ekranda bölüm seçimi |
+| `telefon_yatay_soru.png` | Yatay ekranda soru |
 
 ## 6. Uygulama içeriği (Play Console) 🧑
 
