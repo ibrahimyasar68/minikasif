@@ -72,8 +72,8 @@ Güvenli ve sade:
 
 ## 6. Uygulama içeriği (Play Console) 🧑
 
-- **Gizlilik politikası:** `docs/gizlilik_politikasi.md` taslağını doldur ve
-  herkese açık bir adreste yayınla; adresi gir.
+- **Gizlilik politikası:** `docs/gizlilik_politikasi.md` hazır (e-posta ve
+  tarih dolu). Herkese açık bir adreste yayınla; adresi gir.
 - **Reklamlar:** Hayır.
 - **Uygulama erişimi:** Kısıtlama yok (giriş yok). Not: Ayarlar, simgeyi 2 sn
   basılı tutarak açılır.

@@ -1,13 +1,17 @@
 # Mini Kesif — Gizlilik Politikası
 
-> **TASLAK.** Yayınlamadan önce köşeli parantezli alanları doldurun ve metni
-> herkese açık bir adreste (ör. GitHub Pages, Google Sites) yayınlayın.
-> Play Console bu adresi ister.
+<!--
+  Yayına hazır. Bu metni herkese açık bir adreste (ör. GitHub Pages,
+  Google Sites) yayınlayın; Play Console bu adresi ister.
+  E-posta uygulamadaki lib/app_info.dart > contactEmail ile aynı olmalı
+  (test/gizlilik_politikasi_test.dart doğruluyor).
+  Politika değişirse "Son güncelleme" tarihini de yenileyin.
+-->
 
-**Son güncelleme:** [TARİH]
+**Son güncelleme:** 22 Eylül 2026
 **Geliştirici:** IY Labs
 **Uygulama:** Mini Kesif (`com.iylabs.minikesif`)
-**İletişim:** [İLETİŞİM E-POSTASI]
+**İletişim:** ibrahimyasar68@hotmail.com
 
 ## Özet
 
@@ -56,4 +60,4 @@ tarihi yenilenir.
 
 ## İletişim
 
-Sorularınız için: [İLETİŞİM E-POSTASI]
+Sorularınız için: ibrahimyasar68@hotmail.com
