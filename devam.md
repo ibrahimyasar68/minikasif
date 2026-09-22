@@ -1,6 +1,6 @@
 # MiniKesif — Devam Notu
 
-> Son güncelleme: 2026-09-21 · Son commit: `0a5c2c8` (PHASE 25.4)
+> Son güncelleme: 2026-09-22 · Son commit: `43d645a` (PHASE 25.6)
 > Bu not, projeye ara verdikten sonra kaldığın yerden devam edebilmen için
 > hazırlandı. Yeni bir oturumda önce bu dosyayı ve `CLAUDE.md`'yi oku.
 
@@ -21,7 +21,7 @@
 | Flutter | 3.35.6 stable, Dart SDK ^3.9.2 |
 | Paketler | `provider`, `flutter_tts`, `shared_preferences` (+ `cupertino_icons`) |
 | İçerik | 3 bölüm × 10 soru = 30 soru |
-| Testler | 28 test dosyası, **197 test** (hepsi geçiyor) |
+| Testler | 30 test dosyası, **202 test** (hepsi geçiyor) |
 | Hedef | Play Store'da yayınlamak |
 
 **Çalışma şekli** (`CLAUDE.md`): Kodu AI yazar. Proje safha safha ilerler;
@@ -95,6 +95,8 @@ Diğer klasörler:
 | `android/key.properties.example` | İmza bilgisi şablonu (parolasız) |
 | `test/yatay_ekran_test.dart` | Pixel 6 yatayda her ekran kaydırmadan görünür mü |
 | `test/ekran_yonu_test.dart` | Manifest'te screenOrientation="sensor" mı |
+| `test/gizlilik_politikasi_test.dart` | Politikadaki e-posta uygulamadakiyle aynı mı, yer tutucu kaldı mı |
+| `test/soru_gecisi_test.dart` | Soru geçişinde iki metin üst üste binmiyor mu |
 | `test/app_adi_test.dart` | Launcher adı ile uygulama içi ad eşit mi |
 | `test/helpers/oyun.dart` | Cevapları veriden okuyan ortak test adımları |
 | `test/helpers/gercek_font.dart` | Yerleşim testleri için gerçek Roboto fontu |
@@ -129,6 +131,8 @@ Diğer klasörler:
 | 25.2 | Ayarlar › Hakkında: açıklama, gizlilik özeti, e-posta, IY Labs | `a9b3b14` |
 | 25.3 | Yatay ekran: ana sayfa, oyun, sonuç iki sütun; ayarlar ortalı | `29abde7` |
 | 25.4 | Döndürme kilidinden bağımsız otomatik döndürme (`sensor`) | `0a5c2c8` |
+| 25.5 | Gizlilik politikası: e-posta ve tarih dolduruldu | `bb7221c` |
+| 25.6 | Soru geçişi: önce sön, sonra belir; geçişte dokunma kilidi | `43d645a` |
 
 Her commit mesajında o safhanın ayrıntılı açıklaması var:
 `git log` ile okunabilir.
@@ -228,8 +232,8 @@ Sonra AI'ın yapacakları:
 - 1024×500 tanıtım görseli.
 
 Senin yapacakların (ayrıntı: `docs/play_store_hazirlik.md`):
-- Gizlilik politikasına iletişim e-postasını ve tarihi yazıp herkese açık
-  bir adreste yayınlamak.
+- Gizlilik politikasını (`docs/gizlilik_politikasi.md`, e-posta ve tarih
+  dolu) herkese açık bir adreste yayınlamak.
 - Play Console geliştirici hesabı.
 - Yeni kişisel hesaplarda yayından önce kapalı test (bilinen kural:
   12 test kullanıcısı, 14 gün; güncel şartı Play Console'da kontrol et).
@@ -259,8 +263,6 @@ Kartlarda emoji yerine resim.
       sonra eski uygulamayı telefondan elle sil.
 - [ ] **Telaffuz kontrolü:** "İneği", "Şemsiyeyi" gibi kelimelerin TTS
       telaffuzu kulakla dinlenmedi.
-- [ ] Soru geçişinde çapraz solumada iki soru metni ~320 ms üst üste
-      biniyor. İstenirse "önce sön, sonra belir" tarzına çevrilebilir.
 - [ ] Samsung emoji tasarımında üzüm morumsu pembe görünüyor
       ("Mor üzümü bul" sorusu).
 
@@ -275,7 +277,7 @@ ekranı, arka plan müziği ve müzik ayarı.
 ## 7. Kaldığın yerden devam etmek için
 
 1. Bu dosyayı ve `CLAUDE.md`'yi oku.
-2. `flutter test` ile 197 testin geçtiğini doğrula.
+2. `flutter test` ile 202 testin geçtiğini doğrula.
 3. Sıradaki iş: **6.1** (imza anahtarı). Anahtar oluşturulmadan
    Play Store dosyası derlenemez. Görsellerle ilerlemek istersen önce
    **6.2**'deki görsel kaynağı kararını ver.
