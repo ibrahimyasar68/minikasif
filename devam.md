@@ -13,8 +13,8 @@
 
 | Bilgi | Değer |
 |---|---|
-| Uygulama kimliği | `com.iylabs.minikasif` (yayından sonra değiştirilemez) |
-| Ad | `MiniKasif` (her yerde; ş'siz yazım bilinçli) |
+| Uygulama kimliği | `com.iylabs.minikasif` (henüz yayınlanmadı; yayından SONRA değiştirilemez) |
+| Ad | `MiniKasif` (her yerde; bitişik ve şapkasız yazım bilinçli) |
 | Sürüm | `1.0.0+1` (`pubspec.yaml`) |
 | Dart paket adı | `mini_kasif` (sadece iç import adı, değişmedi) |
 | Platform | Android (iOS hedeflenmiyor; bu makinede Xcode yok) |
@@ -93,7 +93,7 @@ Diğer klasörler:
 | `design/magaza/` | Mağaza ekran görüntüleri ve 1024×500 tanıtım görseli |
 | `tool/tanitim_gorseli.py` | Tanıtım görselini koddan üretir |
 | `docs/play_store_hazirlik.md` | Play Store yayın kontrol listesi |
-| `docs/gizlilik_politikasi.md` | Gizlilik politikası taslağı |
+| `docs/gizlilik_politikasi.md` | Gizlilik politikası (e-posta ve tarih dolu; yayınlanmayı bekliyor) |
 | `android/key.properties.example` | İmza bilgisi şablonu (parolasız) |
 | `test/yatay_ekran_test.dart` | Pixel 6 yatayda her ekran kaydırmadan görünür mü |
 | `test/ekran_yonu_test.dart` | Manifest'te screenOrientation="sensor" mı |
@@ -129,7 +129,7 @@ Diğer klasörler:
 | 24 | Uygulama ikonu: büyüteç, içinde elma, parıltı | `328beb5` |
 | 24.1 | İkona "IY Labs" etiketi | `a0e89b7` |
 | 25 | Yayına hazırlık: ad, kimlik, imza altyapısı, belgeler (**kısmen**) | `f1fb5b6` |
-| 25.1 | Ad tutarsızlığı: her yerde `MiniKasif`, sabit + manifest testi | `0353f7a` |
+| 25.1 | Ad tutarsızlığı: tek sabit + manifest testi (ad o zaman `Mini Kesif`) | `0353f7a` |
 | 25.2 | Ayarlar › Hakkında: açıklama, gizlilik özeti, e-posta, IY Labs | `a9b3b14` |
 | 25.3 | Yatay ekran: ana sayfa, oyun, sonuç iki sütun; ayarlar ortalı | `29abde7` |
 | 25.4 | Döndürme kilidinden bağımsız otomatik döndürme (`sensor`) | `0a5c2c8` |
@@ -188,12 +188,20 @@ Tekrar düşmemek için bilinmesi gerekenler.
   döndürme ayarını da açıyor, deneyi bozuyor.
 - Flutter, Gradle uyarılarını ekranda göstermez. Önemli durumlar hata
   olarak verilmeli.
+- `android/key.properties` yoksa `.aab` derlemesi hata verir ve önceki
+  derlemeden kalan `app-release.aab` varsa siler. (Bir kez, güvence
+  eklenmeden önce derlenmiş debug imzalı bir paket klasörde kalmıştı;
+  öylesi yanlışlıkla Play'e yüklenebilir.)
 
-**Ad**
-- Uygulama adı her yerde **`MiniKasif`** (ş'siz; kullanıcı tercihi).
-  Dart tarafı `lib/app_info.dart` içindeki `appName`'i kullanır;
+**Ad ve kimlik**
+- Uygulama adı her yerde **`MiniKasif`** (bitişik, şapkasız; kullanıcı
+  tercihi). Dart tarafı `lib/app_info.dart` içindeki `appName`'i kullanır;
   AndroidManifest bu sabiti okuyamadığı için elle yazılı, eşitliği
   `test/app_adi_test.dart` koruyor.
+- Ad ve kimlik PHASE 25.8'de `Mini Kesif` / `com.iylabs.minikesif`'ten
+  değişti. Kimlik yalnızca Play'de YAYINLANDIKTAN sonra kilitlenir; bir
+  daha değiştirilemez. İmza anahtarı kimliğe bağlı değil, ad değişince
+  yeniden oluşturmak gerekmedi.
 
 **Testler**
 - Test ortamının fontu her harfi kare çizer ve metni çok uzun ölçer.
@@ -271,7 +279,8 @@ ekranı, arka plan müziği ve müzik ayarı.
 
 1. Bu dosyayı ve `CLAUDE.md`'yi oku.
 2. `flutter test` ile 202 testin geçtiğini doğrula.
-3. Sıradaki iş: **6.1** (imza anahtarı). Anahtar oluşturulmadan
-   Play Store dosyası derlenemez. Görsellerle ilerlemek istersen önce
-   **6.2**'deki görsel kaynağı kararını ver.
+3. Sıradaki iş: kod tarafında **6.2** (gerçek görseller) — başlamadan
+   önce görsel kaynağı kararını ver. Yayın tarafında iş AI'da değil:
+   **6.1**'deki "Kalanlar senin" listesi (Play Console hesabı, gizlilik
+   politikasının yayınlanması, kapalı test, mağaza formları).
 4. Bu notu her safha sonunda güncelle (tamamlananlar tablosu ve plan).
