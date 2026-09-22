@@ -1,6 +1,6 @@
 # MiniKasif — Devam Notu
 
-> Son güncelleme: 2026-09-22 · Son commit: `93f0b25` (PHASE 25 - imzalı paket)
+> Son güncelleme: 2026-09-23 · Son commit: `e4250cc` (PHASE 25.8 - ad değişikliği)
 > Bu not, projeye ara verdikten sonra kaldığın yerden devam edebilmen için
 > hazırlandı. Yeni bir oturumda önce bu dosyayı ve `CLAUDE.md`'yi oku.
 
@@ -137,6 +137,7 @@ Diğer klasörler:
 | 25.6 | Soru geçişi: önce sön, sonra belir; geçişte dokunma kilidi | `43d645a` |
 | 25.7 | Mağaza görselleri, tanıtım görseli, derleme güvencesi | `85a0586` |
 | 25 (kalan) | İmza anahtarı, imzalı `.aab`, imza doğrulaması | `93f0b25` |
+| 25.8 | Ad ve kimlik: MiniKasif / com.iylabs.minikasif | `e4250cc` |
 
 Her commit mesajında o safhanın ayrıntılı açıklaması var:
 `git log` ile okunabilir.
