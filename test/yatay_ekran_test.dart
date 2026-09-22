@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/data/question_data.dart';
-import 'package:mini_kesif/main.dart';
-import 'package:mini_kesif/models/game_section.dart';
-import 'package:mini_kesif/services/audio_service.dart';
-import 'package:mini_kesif/widgets/answer_card.dart';
+import 'package:mini_kasif/data/question_data.dart';
+import 'package:mini_kasif/main.dart';
+import 'package:mini_kasif/models/game_section.dart';
+import 'package:mini_kasif/services/audio_service.dart';
+import 'package:mini_kasif/widgets/answer_card.dart';
 
 import 'helpers/gercek_font.dart';
 import 'helpers/oyun.dart';
@@ -60,11 +60,11 @@ void main() {
 
   testWidgets('Ana sayfa: 3 bölüm de kaydırmadan görünür', (tester) async {
     await yatayPixel6(tester);
-    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+    await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
-    kaydirmadanGorunur(tester, find.text('Mini Kesif'), 'başlık');
+    kaydirmadanGorunur(tester, find.text('MiniKasif'), 'başlık');
     for (final bolum in GameSection.values) {
       kaydirmadanGorunur(tester, find.text(bolum.title), bolum.title);
     }
@@ -87,7 +87,7 @@ void main() {
     tester,
   ) async {
     await yatayPixel6(tester);
-    await tester.pumpWidget(const MiniKesifApp(audio: _TurkcesizSes()));
+    await tester.pumpWidget(const MiniKasifApp(audio: _TurkcesizSes()));
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
@@ -100,7 +100,7 @@ void main() {
   testWidgets('Oyun: 30 sorunun hepsinde soru, kartlar ve geri bildirim '
       'kaydırmadan görünür', (tester) async {
     await yatayPixel6(tester);
-    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+    await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
     await tester.pumpAndSettle();
 
     for (final bolum in GameSection.values) {
@@ -160,7 +160,7 @@ void main() {
     addTearDown(tester.view.reset);
     expect(await tester.runAsync(gercekFontuYukle), isTrue);
 
-    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+    await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
     await tester.pumpAndSettle();
     await bolumeGir(tester, GameSection.fruits);
 
@@ -193,7 +193,7 @@ void main() {
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
 
-    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+    await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull, reason: 'ana sayfa');
 
@@ -216,7 +216,7 @@ void main() {
     tester.platformDispatcher.textScaleFactorTestValue = 2.0;
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
 
-    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+    await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull, reason: 'ana sayfa');
 

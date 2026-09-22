@@ -1,4 +1,4 @@
-# MiniKesif — Devam Notu
+# MiniKasif — Devam Notu
 
 > Son güncelleme: 2026-09-22 · Son commit: `93f0b25` (PHASE 25 - imzalı paket)
 > Bu not, projeye ara verdikten sonra kaldığın yerden devam edebilmen için
@@ -8,15 +8,15 @@
 
 ## 1. Proje özeti
 
-**Mini Kesif**: 0–4 yaş çocuklar için sesli, görsel ve dokunmatik eğitici oyun.
+**MiniKasif**: 0–4 yaş çocuklar için sesli, görsel ve dokunmatik eğitici oyun.
 Çocuk sesli komutu dinler ("Kırmızı elmayı bul") ve doğru karta dokunur.
 
 | Bilgi | Değer |
 |---|---|
-| Uygulama kimliği | `com.iylabs.minikesif` (yayından sonra değiştirilemez) |
-| Ad | `Mini Kesif` (her yerde; ş'siz yazım bilinçli) |
+| Uygulama kimliği | `com.iylabs.minikasif` (yayından sonra değiştirilemez) |
+| Ad | `MiniKasif` (her yerde; ş'siz yazım bilinçli) |
 | Sürüm | `1.0.0+1` (`pubspec.yaml`) |
-| Dart paket adı | `mini_kesif` (sadece iç import adı, değişmedi) |
+| Dart paket adı | `mini_kasif` (sadece iç import adı, değişmedi) |
 | Platform | Android (iOS hedeflenmiyor; bu makinede Xcode yok) |
 | Flutter | 3.35.6 stable, Dart SDK ^3.9.2 |
 | Paketler | `provider`, `flutter_tts`, `shared_preferences` (+ `cupertino_icons`) |
@@ -129,7 +129,7 @@ Diğer klasörler:
 | 24 | Uygulama ikonu: büyüteç, içinde elma, parıltı | `328beb5` |
 | 24.1 | İkona "IY Labs" etiketi | `a0e89b7` |
 | 25 | Yayına hazırlık: ad, kimlik, imza altyapısı, belgeler (**kısmen**) | `f1fb5b6` |
-| 25.1 | Ad tutarsızlığı: her yerde `Mini Kesif`, sabit + manifest testi | `0353f7a` |
+| 25.1 | Ad tutarsızlığı: her yerde `MiniKasif`, sabit + manifest testi | `0353f7a` |
 | 25.2 | Ayarlar › Hakkında: açıklama, gizlilik özeti, e-posta, IY Labs | `a9b3b14` |
 | 25.3 | Yatay ekran: ana sayfa, oyun, sonuç iki sütun; ayarlar ortalı | `29abde7` |
 | 25.4 | Döndürme kilidinden bağımsız otomatik döndürme (`sensor`) | `0a5c2c8` |
@@ -189,7 +189,7 @@ Tekrar düşmemek için bilinmesi gerekenler.
   olarak verilmeli.
 
 **Ad**
-- Uygulama adı her yerde **`Mini Kesif`** (ş'siz; kullanıcı tercihi).
+- Uygulama adı her yerde **`MiniKasif`** (ş'siz; kullanıcı tercihi).
   Dart tarafı `lib/app_info.dart` içindeki `appName`'i kullanır;
   AndroidManifest bu sabiti okuyamadığı için elle yazılı, eşitliği
   `test/app_adi_test.dart` koruyor.
@@ -199,7 +199,7 @@ Tekrar düşmemek için bilinmesi gerekenler.
   Yerleşim testleri `gercekFontuYukle()` kullanmalı.
 - `AnimationController` saymaya bir sonraki karede başlar; testte önce
   `tester.pump()` gerekir.
-- Testlerde uygulama `MiniKesifApp(audio: SilentAudioService())` ile
+- Testlerde uygulama `MiniKasifApp(audio: SilentAudioService())` ile
   açılmalı. Gerçek TTS'in test ortamında "bitti" haberi hiç gelmez.
 - Yeni emoji eklerken Android 8 kapsam testi eski cihazlarda görünmeyen
   emojiyi yakalar.
@@ -210,9 +210,10 @@ Tekrar düşmemek için bilinmesi gerekenler.
 
 ### 6.1 PHASE 25 — yayına hazırlık ✅ (AI tarafı bitti)
 
-İmza anahtarı hazır (`~/iylabs-keys/minikesif-upload.jks`, takma ad
-`upload`), `android/key.properties` dolu (git'e girmez), imzalı paket
-derlendi ve doğrulandı:
+İmza anahtarı hazır (`~/iylabs-keys/minikesif-upload.jks` — dosya adı eski
+adla kaldı, anahtarın uygulama kimliğiyle ilgisi yok; takma ad `upload`),
+`android/key.properties` dolu (git'e girmez), imzalı paket derlendi ve
+doğrulandı:
 `build/app/outputs/bundle/release/app-release.aab` (41,1 MB, sertifika
 sahibi `CN=Ibrahim YASAR`). Grafikler `design/magaza/` altında.
 
@@ -248,8 +249,10 @@ Kartlarda emoji yerine resim.
 ### 6.3 Bekleyen küçük işler ve açık kararlar
 
 - [ ] **Telefona güncel sürüm:** telefonda hâlâ PHASE 20 civarı, eski
-      kimlikli (`com.minikesif.mini_kesif`) sürüm var. Yeni sürümü kurduktan
-      sonra eski uygulamayı telefondan elle sil.
+      kimlikli (`com.minikesif.mini_kesif`) sürüm var. Kimlik o zamandan beri
+      iki kez değişti (`com.iylabs.minikesif` → `com.iylabs.minikasif`), yani
+      eski sürümler ayrı uygulama olarak durur: yenisini kurduktan sonra
+      eskileri telefondan elle sil.
 - [ ] **Telaffuz kontrolü:** "İneği", "Şemsiyeyi" gibi kelimelerin TTS
       telaffuzu kulakla dinlenmedi.
 - [ ] Samsung emoji tasarımında üzüm morumsu pembe görünüyor

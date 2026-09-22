@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/data/feedback_phrases.dart';
+import 'package:mini_kasif/data/feedback_phrases.dart';
 
 void main() {
   test('övgü ve teşvik listeleri boş değil', () {

@@ -16,11 +16,11 @@ Future<void> main() async {
   // Ayarları runApp'ten ÖNCE yükle. Yoksa uygulama bir an sistem temasıyla
   // açılıp sonra kayıtlı temaya geçer: ekran yanıp söner.
   final prefs = await SharedPreferences.getInstance();
-  runApp(MiniKesifApp(prefs: prefs));
+  runApp(MiniKasifApp(prefs: prefs));
 }
 
-class MiniKesifApp extends StatelessWidget {
-  const MiniKesifApp({super.key, this.audio, this.prefs});
+class MiniKasifApp extends StatelessWidget {
+  const MiniKasifApp({super.key, this.audio, this.prefs});
 
   /// Ses servisi. Verilmezse gerçek TTS kullanılır (uygulamanın kendisi).
   ///

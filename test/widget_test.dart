@@ -1,13 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/main.dart';
-import 'package:mini_kesif/services/audio_service.dart';
-import 'package:mini_kesif/models/game_section.dart';
+import 'package:mini_kasif/main.dart';
+import 'package:mini_kasif/services/audio_service.dart';
+import 'package:mini_kasif/models/game_section.dart';
 
 void main() {
   testWidgets('Karşılama ekranında başlık ve 3 bölüm görünür', (tester) async {
-    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+    await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
 
-    expect(find.text('Mini Kesif'), findsOneWidget);
+    expect(find.text('MiniKasif'), findsOneWidget);
 
     // Bölümleri elle yazmıyoruz: enum'dan geliyorlar.
     // Yeni bölüm eklenirse bu test kendiliğinden onu da kontrol eder.

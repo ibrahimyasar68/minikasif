@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/main.dart';
-import 'package:mini_kesif/services/audio_service.dart';
-import 'package:mini_kesif/providers/game_provider.dart';
+import 'package:mini_kasif/main.dart';
+import 'package:mini_kasif/services/audio_service.dart';
+import 'package:mini_kasif/providers/game_provider.dart';
 
 /// Animasyon testleri.
 ///
@@ -11,7 +11,7 @@ import 'package:mini_kesif/providers/game_provider.dart';
 /// gidip o andaki duruma bakıyoruz.
 void main() {
   Future<void> bolumuAc(WidgetTester tester) async {
-    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+    await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
     await tester.tap(find.text('Meyveler'));
     await tester.pumpAndSettle();
   }

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/data/question_data.dart';
-import 'package:mini_kesif/main.dart';
-import 'package:mini_kesif/services/audio_service.dart';
-import 'package:mini_kesif/models/game_section.dart';
-import 'package:mini_kesif/providers/game_provider.dart';
-import 'package:mini_kesif/widgets/answer_card.dart';
+import 'package:mini_kasif/data/question_data.dart';
+import 'package:mini_kasif/main.dart';
+import 'package:mini_kasif/services/audio_service.dart';
+import 'package:mini_kasif/models/game_section.dart';
+import 'package:mini_kasif/providers/game_provider.dart';
+import 'package:mini_kasif/widgets/answer_card.dart';
 
 import 'helpers/oyun.dart';
 
@@ -16,7 +16,7 @@ void main() {
   final n = sorular.length;
 
   Future<void> bolumuAc(WidgetTester tester) async {
-    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+    await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
     await bolumeGir(tester, bolum);
   }
 
@@ -171,7 +171,7 @@ void main() {
 
   group('bölümler', () {
     testWidgets('Hayvanlar bölümü kendi sorularını gösterir', (tester) async {
-      await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+      await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
       await bolumeGir(tester, GameSection.animals);
 
       expect(find.text('Kediyi bul'), findsOneWidget);

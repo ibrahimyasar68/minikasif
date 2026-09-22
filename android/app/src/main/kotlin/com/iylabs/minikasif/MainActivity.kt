@@ -1,4 +1,4 @@
-package com.iylabs.minikesif
+package com.iylabs.minikasif
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -8,4 +8,4 @@
 storePassword=ANAHTAR_DEPOSU_PAROLASI
 keyPassword=ANAHTAR_PAROLASI
 keyAlias=upload
-storeFile=/Users/KULLANICI/iylabs-keys/minikesif-upload.jks
+storeFile=/Users/KULLANICI/iylabs-keys/minikasif-upload.jks

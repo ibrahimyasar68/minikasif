@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/data/question_data.dart';
-import 'package:mini_kesif/main.dart';
-import 'package:mini_kesif/models/game_section.dart';
-import 'package:mini_kesif/providers/game_provider.dart';
-import 'package:mini_kesif/services/audio_service.dart';
+import 'package:mini_kasif/data/question_data.dart';
+import 'package:mini_kasif/main.dart';
+import 'package:mini_kasif/models/game_section.dart';
+import 'package:mini_kasif/providers/game_provider.dart';
+import 'package:mini_kasif/services/audio_service.dart';
 import 'package:provider/provider.dart';
 
 import 'helpers/oyun.dart';
@@ -36,7 +36,7 @@ void main() {
 
   /// İlk soruyu doğru cevaplar ve otomatik geçişi BAŞLATIR (bitirmez).
   Future<void> gecisiBaslat(WidgetTester tester) async {
-    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+    await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
     await tester.pumpAndSettle();
     await bolumeGir(tester, GameSection.fruits);
     final ilk = questionsOf(GameSection.fruits).first;

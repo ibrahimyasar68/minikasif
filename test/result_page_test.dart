@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/data/question_data.dart';
-import 'package:mini_kesif/main.dart';
-import 'package:mini_kesif/services/audio_service.dart';
-import 'package:mini_kesif/models/game_section.dart';
+import 'package:mini_kasif/data/question_data.dart';
+import 'package:mini_kasif/main.dart';
+import 'package:mini_kasif/services/audio_service.dart';
+import 'package:mini_kasif/models/game_section.dart';
 
 import 'helpers/oyun.dart';
 
 void main() {
   /// Uygulamayı açar, bölüme girer ve sonuna kadar doğru oynar.
   Future<void> bolumuBitir(WidgetTester tester, GameSection bolum) async {
-    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+    await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
     await bolumeGir(tester, bolum);
     await bolumuOyna(tester, bolum);
   }
@@ -86,7 +86,7 @@ void main() {
 
     await dokun(tester, find.text('Ana sayfa'));
 
-    expect(find.text('Mini Kesif'), findsOneWidget);
+    expect(find.text('MiniKasif'), findsOneWidget);
     for (final s in GameSection.values) {
       expect(find.text(s.title), findsOneWidget, reason: s.title);
     }

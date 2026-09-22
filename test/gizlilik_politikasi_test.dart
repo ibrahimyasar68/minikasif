@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/app_info.dart';
+import 'package:mini_kasif/app_info.dart';
 
 /// Gizlilik politikası Play Store'da yayınlanacak bir belge. Uygulamanın
 /// Ayarlar > Hakkında bölümündeki bilgilerle çelişmemeli.

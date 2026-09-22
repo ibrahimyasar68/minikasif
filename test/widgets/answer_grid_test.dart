@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/models/answer_option.dart';
-import 'package:mini_kesif/widgets/answer_card.dart';
-import 'package:mini_kesif/widgets/answer_grid.dart';
+import 'package:mini_kasif/models/answer_option.dart';
+import 'package:mini_kasif/widgets/answer_card.dart';
+import 'package:mini_kasif/widgets/answer_grid.dart';
 
 /// AnswerGrid'i doğrudan test ediyoruz.
 ///

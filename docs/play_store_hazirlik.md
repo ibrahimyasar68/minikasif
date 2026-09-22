@@ -1,12 +1,14 @@
-# Play Store Yayın Kontrol Listesi — Mini Kesif
+# Play Store Yayın Kontrol Listesi — MiniKasif
 
-Kimlik: `com.iylabs.minikesif` · Sürüm: `1.0.0` (versionCode 1)
+Kimlik: `com.iylabs.minikasif` · Sürüm: `1.0.0` (versionCode 1)
 
 İşaretler: 🧑 senin yapman gereken · 🤖 benim hazırladığım/hazırlayabileceğim
 
 ## 1. İmza anahtarı 🧑 ✅
 
-Anahtar 22 Eylül 2026'da oluşturuldu: `~/iylabs-keys/minikesif-upload.jks`,
+Anahtar 22 Eylül 2026'da oluşturuldu: `~/iylabs-keys/minikesif-upload.jks`
+(dosya adı uygulamanın eski adından geliyor; anahtarın uygulama kimliğiyle
+ilgisi yoktur, ad değişince yeniden oluşturmak gerekmedi),
 takma ad `upload`, sertifika 2054'e kadar geçerli (Play en az 2033 istiyor).
 Yükleme sertifikasının SHA-256 parmak izi:
 
@@ -33,8 +35,12 @@ Anahtar yoksa `.aab` derlemesi bilerek hata verir.
 
 ## 2. Derleme 🤖 ✅
 
-İlk imzalı paket 22 Eylül 2026'da derlendi ve doğrulandı: imza sahibi
-`CN=Ibrahim YASAR` (debug değil), `com.iylabs.minikesif`, versionCode 1,
+Uygulama 23 Eylül 2026'da `MiniKasif` / `com.iylabs.minikasif` olarak
+yeniden adlandırıldı (henüz yayınlanmadığı için kimlik serbestti) ve paket
+aynı anahtarla yeniden derlendi.
+
+İmzalı paket doğrulandı: imza sahibi
+`CN=Ibrahim YASAR` (debug değil), `com.iylabs.minikasif`, versionCode 1,
 versionName 1.0.0, minSdk 24, targetSdk 36. Paket 41,1 MB; üç işlemci
 mimarisini birden taşıyor, cihaza inen parça ~17 MB (arm64).
 
@@ -76,12 +82,12 @@ Notlar:
 
 ## 4. Mağaza girişi 🤖 taslak / 🧑 onay
 
-- **Uygulama adı** (≤30): `Mini Kesif`
+- **Uygulama adı** (≤30): `MiniKasif`
 - **Kısa açıklama** (≤80, şu an 76): 0-4 yaş için sesli ve dokunmatik eğitici oyun: meyveler, hayvanlar, nesneler
 - **Uzun açıklama** (≤4000, şu an 634):
 
 ```text
-Mini Kesif, 0-4 yaş çocuklar için dinle, bak ve dokun temelli bir eğitici oyundur.
+MiniKasif, 0-4 yaş çocuklar için dinle, bak ve dokun temelli bir eğitici oyundur.
 
 Çocuk sesli komutu dinler ("Kırmızı elmayı bul") ve doğru resme dokunur. Okuma bilmeyen küçük çocuklar için tasarlandı: büyük kartlar, sesli yönlendirme ve az yazı.
 

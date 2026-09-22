@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/main.dart';
-import 'package:mini_kesif/models/game_section.dart';
-import 'package:mini_kesif/services/audio_service.dart';
-import 'package:mini_kesif/widgets/answer_grid.dart';
+import 'package:mini_kasif/main.dart';
+import 'package:mini_kasif/models/game_section.dart';
+import 'package:mini_kasif/services/audio_service.dart';
+import 'package:mini_kasif/widgets/answer_grid.dart';
 
 import 'helpers/gercek_font.dart';
 import 'helpers/oyun.dart';
@@ -25,7 +25,7 @@ void main() {
     addTearDown(tester.view.reset);
     expect(await tester.runAsync(gercekFontuYukle), isTrue);
 
-    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+    await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
     await tester.pumpAndSettle();
 
     final baslikTepe = <String, double>{};

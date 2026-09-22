@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/models/game_section.dart';
-import 'package:mini_kesif/providers/progress_provider.dart';
+import 'package:mini_kasif/models/game_section.dart';
+import 'package:mini_kasif/providers/progress_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {

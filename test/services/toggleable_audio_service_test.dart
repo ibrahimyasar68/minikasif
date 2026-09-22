@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/services/audio_service.dart';
+import 'package:mini_kasif/services/audio_service.dart';
 
 class KayitSes implements AudioService {
   final konusmalar = <String>[];

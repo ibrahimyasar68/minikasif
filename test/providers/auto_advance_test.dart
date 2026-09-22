@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/models/game_section.dart';
-import 'package:mini_kesif/providers/game_provider.dart';
-import 'package:mini_kesif/services/audio_service.dart';
+import 'package:mini_kasif/models/game_section.dart';
+import 'package:mini_kasif/providers/game_provider.dart';
+import 'package:mini_kasif/services/audio_service.dart';
 
 /// Konuşmaların ne zaman BİTECEĞİNİ testin kontrol ettiği sahte servis.
 ///

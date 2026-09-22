@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""MiniKesif uygulama ikonunu üretir.
+"""MiniKasif uygulama ikonunu üretir.
 
 Tasarım: turuncu zemin üzerinde büyüteç; merceğin içinde kırmızı bir elma
 ("bir şey keşfettik"), köşede küçük bir parıltı ve sağ altta "IY Labs" etiketi. İkon koddan çizildiği için
@@ -295,7 +295,7 @@ def onizleme(yol):
     W, H = 1160, 700
     sayfa = Image.new("RGBA", (W, H), (250, 246, 240, 255))
     d = ImageDraw.Draw(sayfa)
-    d.text((24, 16), "MiniKesif ikonu - telefon markalarinin kirpma sekilleri", fill=(40, 40, 40), font=font)
+    d.text((24, 16), "MiniKasif ikonu - telefon markalarinin kirpma sekilleri", fill=(40, 40, 40), font=font)
     buyuk = gorunur(216)
     for i, (ad, sekil) in enumerate([("Daire (Pixel)", "daire"), ("Squircle (Samsung)", "squircle"),
                                      ("Yuvarlak kare", "yuvarlak_kare")]):

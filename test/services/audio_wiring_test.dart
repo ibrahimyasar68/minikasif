@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/models/answer_option.dart';
-import 'package:mini_kesif/data/feedback_phrases.dart';
-import 'package:mini_kesif/models/game_section.dart';
-import 'package:mini_kesif/providers/game_provider.dart';
-import 'package:mini_kesif/services/audio_service.dart';
+import 'package:mini_kasif/models/answer_option.dart';
+import 'package:mini_kasif/data/feedback_phrases.dart';
+import 'package:mini_kasif/models/game_section.dart';
+import 'package:mini_kasif/providers/game_provider.dart';
+import 'package:mini_kasif/services/audio_service.dart';
 
 /// Ne söylendiğini kaydeden sahte servis.
 ///

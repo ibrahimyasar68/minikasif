@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/main.dart';
-import 'package:mini_kesif/services/audio_service.dart';
-import 'package:mini_kesif/widgets/parent_gate_button.dart';
+import 'package:mini_kasif/main.dart';
+import 'package:mini_kasif/services/audio_service.dart';
+import 'package:mini_kasif/widgets/parent_gate_button.dart';
 
 import '../helpers/oyun.dart';
 
@@ -96,18 +96,18 @@ void main() {
 
   group('ana sayfada', () {
     testWidgets('ayar simgesine dokunmak ayarları AÇMAZ', (tester) async {
-      await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+      await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
       await tester.pumpAndSettle();
 
       await tester.tap(find.byIcon(Icons.settings_rounded));
       await tester.pumpAndSettle();
 
       expect(find.text('Sesli okuma'), findsNothing);
-      expect(find.text('Mini Kesif'), findsOneWidget);
+      expect(find.text('MiniKasif'), findsOneWidget);
     });
 
     testWidgets('basılı tutunca ayarlar açılır', (tester) async {
-      await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+      await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
       await tester.pumpAndSettle();
 
       await ayarlariAc(tester);

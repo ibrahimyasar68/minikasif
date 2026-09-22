@@ -22,7 +22,7 @@ if (releaseKeyVar) {
 
 android {
     // Uygulama kimliği. Play Store'da yayınlandıktan sonra DEĞİŞTİRİLEMEZ.
-    namespace = "com.iylabs.minikesif"
+    namespace = "com.iylabs.minikasif"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -36,7 +36,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.iylabs.minikesif"
+        applicationId = "com.iylabs.minikasif"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         // pubspec.yaml'daki "version: 1.0.0+1" -> versionName 1.0.0, versionCode 1.

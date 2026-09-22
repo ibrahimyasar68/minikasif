@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/main.dart';
-import 'package:mini_kesif/services/audio_service.dart';
+import 'package:mini_kasif/main.dart';
+import 'package:mini_kasif/services/audio_service.dart';
 
 import '../helpers/gercek_font.dart';
 import '../helpers/oyun.dart';
@@ -26,7 +26,7 @@ void main() {
   const baslik = 'Türkçe ses bulunamadı';
 
   testWidgets('Türkçe ses yoksa ana ekranda uyarı görünür', (tester) async {
-    await tester.pumpWidget(MiniKesifApp(audio: AyarliSes(turkceVar: false)));
+    await tester.pumpWidget(MiniKasifApp(audio: AyarliSes(turkceVar: false)));
     await tester.pumpAndSettle();
 
     expect(find.text(baslik), findsOneWidget);
@@ -34,7 +34,7 @@ void main() {
   });
 
   testWidgets('Türkçe ses varsa uyarı görünmez', (tester) async {
-    await tester.pumpWidget(MiniKesifApp(audio: AyarliSes(turkceVar: true)));
+    await tester.pumpWidget(MiniKasifApp(audio: AyarliSes(turkceVar: true)));
     await tester.pumpAndSettle();
 
     expect(find.text(baslik), findsNothing);
@@ -44,7 +44,7 @@ void main() {
     tester,
   ) async {
     final ses = AyarliSes(turkceVar: false);
-    await tester.pumpWidget(MiniKesifApp(audio: ses));
+    await tester.pumpWidget(MiniKasifApp(audio: ses));
     await tester.pumpAndSettle();
     expect(find.text(baslik), findsOneWidget);
 
@@ -59,7 +59,7 @@ void main() {
   testWidgets('Türkçe ses yoksa oyunda tekrar-dinle butonu gizlenir', (
     tester,
   ) async {
-    await tester.pumpWidget(MiniKesifApp(audio: AyarliSes(turkceVar: false)));
+    await tester.pumpWidget(MiniKasifApp(audio: AyarliSes(turkceVar: false)));
     await tester.pumpAndSettle();
     // dokun = önce görünür yap, sonra dokun. Uyarı bandı bölüm butonlarını
     // aşağı itiyor; küçük test penceresinde düz tap() ıskalıyordu.
@@ -72,7 +72,7 @@ void main() {
   });
 
   testWidgets('Türkçe ses varsa tekrar-dinle butonu görünür', (tester) async {
-    await tester.pumpWidget(MiniKesifApp(audio: AyarliSes(turkceVar: true)));
+    await tester.pumpWidget(MiniKasifApp(audio: AyarliSes(turkceVar: true)));
     await tester.pumpAndSettle();
     await dokun(tester, find.text('Meyveler'));
 
@@ -87,7 +87,7 @@ void main() {
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
 
-    await tester.pumpWidget(MiniKesifApp(audio: AyarliSes(turkceVar: false)));
+    await tester.pumpWidget(MiniKasifApp(audio: AyarliSes(turkceVar: false)));
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
@@ -107,12 +107,12 @@ void main() {
     final sinir = (2400 - 63) / 2.625;
 
     // Gerçek font: test fontu metni cihazdakinden çok daha uzun ölçüyor
-    // ("Mini Kesif" bile iki satıra bölünüyordu). O zaman bu test cihazı
+    // ("MiniKasif" bile iki satıra bölünüyordu). O zaman bu test cihazı
     // değil, test fontunu ölçerdi.
     final fontVar = await tester.runAsync(gercekFontuYukle);
     expect(fontVar, isTrue, reason: "Roboto yüklenemedi (FLUTTER_ROOT?)");
 
-    await tester.pumpWidget(MiniKesifApp(audio: AyarliSes(turkceVar: false)));
+    await tester.pumpWidget(MiniKasifApp(audio: AyarliSes(turkceVar: false)));
     await tester.pumpAndSettle();
 
     expect(find.text(baslik), findsOneWidget);

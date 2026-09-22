@@ -5,8 +5,9 @@
 /// `android:label`) bu dosyayı okuyamadığı için elle yazılmak zorunda;
 /// ikisinin aynı kaldığını `test/app_adi_test.dart` doğruluyor.
 ///
-/// Not: "Keşif" değil "Kesif" — ş'siz yazım bilinçli bir tercih.
-const appName = 'Mini Kesif';
+/// Not: "Mini Kâşif" değil "MiniKasif" — bitişik ve şapkasız yazım
+/// bilinçli bir tercih.
+const appName = 'MiniKasif';
 
 /// Geliştirici etiketi (uygulama ikonundaki etiketle aynı).
 const developerName = 'IY Labs';

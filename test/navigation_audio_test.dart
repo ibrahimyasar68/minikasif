@@ -1,15 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
-import 'package:mini_kesif/main.dart';
-import 'package:mini_kesif/models/game_section.dart';
-import 'package:mini_kesif/providers/game_provider.dart';
-import 'package:mini_kesif/services/audio_service.dart';
+import 'package:mini_kasif/main.dart';
+import 'package:mini_kasif/models/game_section.dart';
+import 'package:mini_kasif/providers/game_provider.dart';
+import 'package:mini_kasif/services/audio_service.dart';
 
 import 'helpers/oyun.dart';
 
 /// Ekranlar arası geçişte ses davranışı.
 ///
-/// Sahte ses servisiyle gerçek uygulamayı (MiniKesifApp) açıyoruz: ne
+/// Sahte ses servisiyle gerçek uygulamayı (MiniKasifApp) açıyoruz: ne
 /// söylendiğini ve sesin durdurulup durdurulmadığını görebiliyoruz. Gerçek
 /// bağlantı (ayar sarmalayıcısı dahil) da böylece sınanmış oluyor.
 class FakeAudio implements AudioService {
@@ -31,7 +31,7 @@ void main() {
 
   Future<void> uygulamayiKur(WidgetTester tester) async {
     audio = FakeAudio();
-    await tester.pumpWidget(MiniKesifApp(audio: audio));
+    await tester.pumpWidget(MiniKasifApp(audio: audio));
     await bolumeGir(tester, GameSection.fruits);
   }
 

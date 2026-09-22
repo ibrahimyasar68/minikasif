@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/main.dart';
-import 'package:mini_kesif/services/audio_service.dart';
-import 'package:mini_kesif/models/game_section.dart';
-import 'package:mini_kesif/widgets/answer_card.dart';
+import 'package:mini_kasif/main.dart';
+import 'package:mini_kasif/services/audio_service.dart';
+import 'package:mini_kasif/models/game_section.dart';
+import 'package:mini_kasif/widgets/answer_card.dart';
 
 import 'helpers/oyun.dart';
 
@@ -47,7 +47,7 @@ void main() {
   // 2, 3 ve 4 seçenekli düzenlerin HEPSİ ortalı olmalı.
   testWidgets('Her soruda kartlar yatayda ortalı', (tester) async {
     ekranAyarla(tester);
-    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+    await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
 
     for (final bolum in GameSection.values) {
       await bolumeGir(tester, bolum);
@@ -68,7 +68,7 @@ void main() {
 
   testWidgets('Tebrik ekranındaki içerik yatayda ortalı', (tester) async {
     ekranAyarla(tester);
-    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+    await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
     await bolumeGir(tester, GameSection.fruits);
     await bolumuOyna(tester, GameSection.fruits);
 

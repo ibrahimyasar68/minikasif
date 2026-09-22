@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/data/question_data.dart';
-import 'package:mini_kesif/main.dart';
-import 'package:mini_kesif/models/game_section.dart';
-import 'package:mini_kesif/services/audio_service.dart';
+import 'package:mini_kasif/data/question_data.dart';
+import 'package:mini_kasif/main.dart';
+import 'package:mini_kasif/models/game_section.dart';
+import 'package:mini_kasif/services/audio_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'helpers/oyun.dart';
@@ -37,7 +37,7 @@ void main() {
   }
 
   testWidgets('Oynanmamış bölümlerde boş yıldızlar görünür', (tester) async {
-    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+    await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
     await tester.pumpAndSettle();
 
     for (final b in GameSection.values) {
@@ -49,7 +49,7 @@ void main() {
   testWidgets('Bölüm bitince rekor mesajı çıkar, ana sayfada yıldızlar dolar', (
     tester,
   ) async {
-    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+    await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
     await tester.pumpAndSettle();
     await meyveleriOyna(tester);
 
@@ -64,7 +64,7 @@ void main() {
   testWidgets('Daha kötü oyun rekoru bozmaz, rekor mesajı çıkmaz', (
     tester,
   ) async {
-    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+    await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
     await tester.pumpAndSettle();
     await meyveleriOyna(tester); // 3 yıldız
     await dokun(tester, find.text('Tekrar oyna'));
@@ -77,7 +77,7 @@ void main() {
 
   testWidgets('Rekor sesli okunur; rekor değilse okunmaz', (tester) async {
     final ses = KayitSes();
-    await tester.pumpWidget(MiniKesifApp(audio: ses));
+    await tester.pumpWidget(MiniKasifApp(audio: ses));
     await tester.pumpAndSettle();
 
     await meyveleriOyna(tester);
@@ -93,7 +93,7 @@ void main() {
     final prefs = await tester.runAsync(SharedPreferences.getInstance);
 
     await tester.pumpWidget(
-      MiniKesifApp(audio: const SilentAudioService(), prefs: prefs),
+      MiniKasifApp(audio: const SilentAudioService(), prefs: prefs),
     );
     await tester.pumpAndSettle();
 
@@ -106,7 +106,7 @@ void main() {
       SharedPreferences.setMockInitialValues({'en_iyi_yildiz_fruits': 3});
       final prefs = await tester.runAsync(SharedPreferences.getInstance);
       await tester.pumpWidget(
-        MiniKesifApp(audio: const SilentAudioService(), prefs: prefs),
+        MiniKasifApp(audio: const SilentAudioService(), prefs: prefs),
       );
       await tester.pumpAndSettle();
       await ayarlariAc(tester);

@@ -1,4 +1,4 @@
-# Mini Kesif — Gizlilik Politikası
+# MiniKasif — Gizlilik Politikası
 
 <!--
   Yayına hazır. Bu metni herkese açık bir adreste (ör. GitHub Pages,
@@ -10,12 +10,12 @@
 
 **Son güncelleme:** 22 Eylül 2026
 **Geliştirici:** IY Labs
-**Uygulama:** Mini Kesif (`com.iylabs.minikesif`)
+**Uygulama:** MiniKasif (`com.iylabs.minikasif`)
 **İletişim:** ibrahimyasar68@hotmail.com
 
 ## Özet
 
-Mini Kesif, 0–4 yaş arası çocuklar için hazırlanmış çevrimdışı bir eğitici
+MiniKasif, 0–4 yaş arası çocuklar için hazırlanmış çevrimdışı bir eğitici
 oyundur. **Hiçbir kişisel veri toplamaz, saklamaz veya paylaşmaz.**
 
 ## Toplanan veriler

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/app_info.dart';
-import 'package:mini_kesif/main.dart';
-import 'package:mini_kesif/models/game_section.dart';
-import 'package:mini_kesif/services/audio_service.dart';
-import 'package:mini_kesif/theme/app_colors.dart';
+import 'package:mini_kasif/app_info.dart';
+import 'package:mini_kasif/main.dart';
+import 'package:mini_kasif/models/game_section.dart';
+import 'package:mini_kasif/services/audio_service.dart';
+import 'package:mini_kasif/theme/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'helpers/gercek_font.dart';
@@ -39,7 +39,7 @@ void main() {
   testWidgets('Ana sayfadaki ayar simgesi ayarlar sayfasını açar', (
     tester,
   ) async {
-    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+    await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
     await tester.pumpAndSettle();
     await ayarlariAc(tester);
 
@@ -51,7 +51,7 @@ void main() {
 
   testWidgets('Ses açıkken bölüme girince soru okunur', (tester) async {
     final ses = KayitSes();
-    await tester.pumpWidget(MiniKesifApp(audio: ses));
+    await tester.pumpWidget(MiniKasifApp(audio: ses));
     await tester.pumpAndSettle();
     await bolumeGir(tester, GameSection.fruits);
 
@@ -63,7 +63,7 @@ void main() {
     tester,
   ) async {
     final ses = KayitSes();
-    await tester.pumpWidget(MiniKesifApp(audio: ses));
+    await tester.pumpWidget(MiniKasifApp(audio: ses));
     await tester.pumpAndSettle();
     await ayarlariAc(tester);
     await tester.tap(find.byType(Switch));
@@ -82,7 +82,7 @@ void main() {
   });
 
   testWidgets('Koyu tema seçilince koyu renkler uygulanır', (tester) async {
-    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+    await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
     await tester.pumpAndSettle();
     await ayarlariAc(tester);
     await tester.tap(find.text('Koyu'));
@@ -96,7 +96,7 @@ void main() {
   });
 
   testWidgets('Açık tema seçilince açık renkler uygulanır', (tester) async {
-    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+    await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
     await tester.pumpAndSettle();
     await ayarlariAc(tester);
     await tester.tap(find.text('Koyu'));
@@ -113,7 +113,7 @@ void main() {
     tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
     addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
 
-    await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+    await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
     await tester.pumpAndSettle();
 
     expect(temaModu(tester), ThemeMode.system);
@@ -128,7 +128,7 @@ void main() {
     final prefs = await tester.runAsync(SharedPreferences.getInstance);
     final ses = KayitSes();
 
-    await tester.pumpWidget(MiniKesifApp(audio: ses, prefs: prefs));
+    await tester.pumpWidget(MiniKasifApp(audio: ses, prefs: prefs));
     await tester.pumpAndSettle();
 
     expect(temaModu(tester), ThemeMode.dark);
@@ -150,7 +150,7 @@ void main() {
     testWidgets('oyun bilgisi, e-posta ve IY Labs etiketi görünür', (
       tester,
     ) async {
-      await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+      await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
       await tester.pumpAndSettle();
       await ayarlariAc(tester);
       await hakkindayaKaydir(tester);
@@ -171,7 +171,7 @@ void main() {
       addTearDown(tester.view.reset);
       expect(await tester.runAsync(gercekFontuYukle), isTrue);
 
-      await tester.pumpWidget(const MiniKesifApp(audio: SilentAudioService()));
+      await tester.pumpWidget(const MiniKasifApp(audio: SilentAudioService()));
       await tester.pumpAndSettle();
       await ayarlariAc(tester);
       await hakkindayaKaydir(tester);

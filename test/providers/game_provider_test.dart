@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/models/answer_option.dart';
-import 'package:mini_kesif/models/game_section.dart';
-import 'package:mini_kesif/models/question.dart';
-import 'package:mini_kesif/providers/game_provider.dart';
+import 'package:mini_kasif/models/answer_option.dart';
+import 'package:mini_kasif/models/game_section.dart';
+import 'package:mini_kasif/models/question.dart';
+import 'package:mini_kasif/providers/game_provider.dart';
 
 /// Bu dosyada hiç widget yok, ekran çizilmiyor.
 /// GameProvider hiçbir UI import etmediği için oyun mantığını

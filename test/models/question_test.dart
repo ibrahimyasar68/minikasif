@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/models/answer_option.dart';
-import 'package:mini_kesif/models/game_section.dart';
-import 'package:mini_kesif/models/question.dart';
+import 'package:mini_kasif/models/answer_option.dart';
+import 'package:mini_kasif/models/game_section.dart';
+import 'package:mini_kasif/models/question.dart';
 
 void main() {
   // Testlerde tekrar tekrar kullanacağımız örnek soru.

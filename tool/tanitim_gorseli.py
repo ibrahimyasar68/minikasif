@@ -24,7 +24,7 @@ CIKTI = KOK / "design/magaza/tanitim_1024x500.png"
 EN, BOY = 1024, 500
 BEYAZ = (255, 255, 255)
 
-BASLIK = "Mini Kesif"
+BASLIK = "MiniKasif"
 ALT_BASLIK = "Dinle, bak, dokun"
 ACIKLAMA = "0-4 yaş için eğitici oyun"
 

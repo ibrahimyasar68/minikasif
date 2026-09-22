@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:mini_kesif/services/audio_service.dart';
+import 'package:mini_kasif/services/audio_service.dart';
 
 /// Gerçek TtsAudioService'in hata toleransı.
 ///

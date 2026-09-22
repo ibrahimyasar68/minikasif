@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/data/question_data.dart';
-import 'package:mini_kesif/models/game_section.dart';
-import 'package:mini_kesif/models/question.dart';
-import 'package:mini_kesif/providers/game_provider.dart';
+import 'package:mini_kasif/data/question_data.dart';
+import 'package:mini_kasif/models/game_section.dart';
+import 'package:mini_kasif/models/question.dart';
+import 'package:mini_kasif/providers/game_provider.dart';
 
 /// Testler arasında paylaşılan oyun adımları.
 ///
@@ -33,7 +33,7 @@ Future<void> dokun(WidgetTester tester, Finder hedef) async {
 /// geçiş en az bekleme süresinden sonra olur. pump(süre) sahte saati
 /// ileri sarar; pumpAndSettle ardından geçiş animasyonunu bitirir.
 ///
-/// DİKKAT: MiniKesifApp'e SilentAudioService geçilmezse gerçek TTS
+/// DİKKAT: MiniKasifApp'e SilentAudioService geçilmezse gerçek TTS
 /// kullanılır; test ortamında "bitti" haberi hiç gelmez ve bu bekleme
 /// yetmez (geçiş ancak 4 sn'lik güvenlik sınırında olur).
 Future<void> otomatikGecisiBekle(WidgetTester tester) async {

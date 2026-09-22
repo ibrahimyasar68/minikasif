@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mini_kesif/data/question_data.dart';
-import 'package:mini_kesif/models/game_section.dart';
+import 'package:mini_kasif/data/question_data.dart';
+import 'package:mini_kasif/models/game_section.dart';
 
 void main() {
   test('soru listesi boş değil', () {
