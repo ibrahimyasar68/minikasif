@@ -22,6 +22,8 @@
 | Paketler | `provider`, `flutter_tts`, `shared_preferences` (+ `cupertino_icons`) |
 | İçerik | 3 bölüm × 10 soru = 30 soru |
 | Testler | 30 test dosyası, **202 test** (hepsi geçiyor) |
+| Depo | https://github.com/ibrahimyasar68/minikasif (herkese açık) |
+| Gizlilik politikası | https://ibrahimyasar68.github.io/minikasif/gizlilik_politikasi.html (GitHub Pages, kökteki `gizlilik_politikasi.md`) |
 | Hedef | Play Store'da yayınlamak |
 
 **Çalışma şekli** (`CLAUDE.md`): Kodu AI yazar. Proje safha safha ilerler;
@@ -231,7 +233,6 @@ Yeni paket gerektiğinde: `flutter build appbundle --release`, ardından
 `pubspec.yaml` içindeki sürümün `+` sonrası artmalı.
 
 **Kalanlar senin (ayrıntı: `docs/play_store_hazirlik.md`):**
-- Gizlilik politikasını herkese açık bir adreste yayınlamak (metin hazır).
 - Play Console geliştirici hesabı.
 - Yeni kişisel hesaplarda yayından önce kapalı test (bilinen kural:
   12 test kullanıcısı, 14 gün; güncel şartı Play Console'da kontrol et).
