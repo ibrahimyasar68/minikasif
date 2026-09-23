@@ -231,7 +231,7 @@ class _Hakkinda extends StatelessWidget {
               style: aciklama,
             ),
             const SizedBox(height: 12),
-            // Gizlilik politikasıyla (docs/gizlilik_politikasi.md) aynı
+            // Gizlilik politikasıyla (gizlilik_politikasi.md) aynı
             // şeyleri söylemeli. Politika değişirse burası da değişir.
             Text(
               'İnternet gerekmez, reklam yoktur, hiçbir kişisel veri '

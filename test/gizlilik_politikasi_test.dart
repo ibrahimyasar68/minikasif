@@ -6,7 +6,7 @@ import 'package:mini_kasif/app_info.dart';
 /// Gizlilik politikası Play Store'da yayınlanacak bir belge. Uygulamanın
 /// Ayarlar > Hakkında bölümündeki bilgilerle çelişmemeli.
 void main() {
-  final politika = File('docs/gizlilik_politikasi.md').readAsStringSync();
+  final politika = File('gizlilik_politikasi.md').readAsStringSync();
 
   test('İletişim adresi uygulamadakiyle aynı', () {
     expect(politika, contains(contactEmail));

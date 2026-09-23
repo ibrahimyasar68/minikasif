@@ -93,7 +93,7 @@ Diğer klasörler:
 | `design/magaza/` | Mağaza ekran görüntüleri ve 1024×500 tanıtım görseli |
 | `tool/tanitim_gorseli.py` | Tanıtım görselini koddan üretir |
 | `docs/play_store_hazirlik.md` | Play Store yayın kontrol listesi |
-| `docs/gizlilik_politikasi.md` | Gizlilik politikası (e-posta ve tarih dolu; yayınlanmayı bekliyor) |
+| `gizlilik_politikasi.md` | Gizlilik politikası (e-posta ve tarih dolu; yayınlanmayı bekliyor) |
 | `android/key.properties.example` | İmza bilgisi şablonu (parolasız) |
 | `test/yatay_ekran_test.dart` | Pixel 6 yatayda her ekran kaydırmadan görünür mü |
 | `test/ekran_yonu_test.dart` | Manifest'te screenOrientation="sensor" mı |

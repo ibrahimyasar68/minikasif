@@ -130,8 +130,11 @@ oldu hem de durum çubuğu ile hareket çubuğu çıktı. Yataylarda soldaki kam
 
 ## 6. Uygulama içeriği (Play Console) 🧑
 
-- **Gizlilik politikası:** `docs/gizlilik_politikasi.md` hazır (e-posta ve
-  tarih dolu). Herkese açık bir adreste yayınla; adresi gir.
+- **Gizlilik politikası:** ✅ yayında. Play Console'a girilecek adres:
+  `https://ibrahimyasar68.github.io/minikasif/gizlilik_politikasi.html`
+  (GitHub Pages, `ibrahimyasar68/minikasif` deposunun kökündeki
+  `gizlilik_politikasi.md` dosyasından üretiliyor). Metin değişirse
+  depoya push etmek yeterli; sayfa kendiliğinden güncellenir.
 - **Reklamlar:** Hayır.
 - **Uygulama erişimi:** Kısıtlama yok (giriş yok). Not: Ayarlar, simgeyi 2 sn
   basılı tutarak açılır.

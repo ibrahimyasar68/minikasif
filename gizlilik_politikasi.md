@@ -1,8 +1,9 @@
 # MiniKasif — Gizlilik Politikası
 
 <!--
-  Yayına hazır. Bu metni herkese açık bir adreste (ör. GitHub Pages,
-  Google Sites) yayınlayın; Play Console bu adresi ister.
+  YAYINDA: https://ibrahimyasar68.github.io/minikasif/gizlilik_politikasi.html
+  GitHub Pages bu dosyayı deponun KÖKÜNDEN yayınlıyor; dosyanın yeri ya da
+  adı değişirse adres kırılır ve Play Console'daki bağlantı çalışmaz.
   E-posta uygulamadaki lib/app_info.dart > contactEmail ile aynı olmalı
   (test/gizlilik_politikasi_test.dart doğruluyor).
   Politika değişirse "Son güncelleme" tarihini de yenileyin.
