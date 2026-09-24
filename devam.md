@@ -15,7 +15,7 @@
 |---|---|
 | Uygulama kimliği | `com.iylabs.minikasif` — **Play'e yüklendi, ARTIK DEĞİŞTİRİLEMEZ** |
 | Ad | `MiniKasif` (her yerde; bitişik ve şapkasız yazım bilinçli) |
-| Sürüm | `1.0.0+1` (`pubspec.yaml`) |
+| Sürüm | `1.0.1+2` (`pubspec.yaml`); yayında olan: 1.0.0+1 |
 | Dart paket adı | `mini_kasif` (sadece iç import adı, değişmedi) |
 | Platform | Android (iOS hedeflenmiyor; bu makinede Xcode yok) |
 | Flutter | 3.35.6 stable, Dart SDK ^3.9.2 |

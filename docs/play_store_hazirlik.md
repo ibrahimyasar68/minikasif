@@ -1,6 +1,6 @@
 # Play Store Yayın Kontrol Listesi — MiniKasif
 
-Kimlik: `com.iylabs.minikasif` · Sürüm: `1.0.0` (versionCode 1)
+Kimlik: `com.iylabs.minikasif` (Play'e yüklendi, DEĞİŞTİRİLEMEZ) · Sürüm: `1.0.1` (versionCode 2)
 
 İşaretler: 🧑 senin yapman gereken · 🤖 benim hazırladığım/hazırlayabileceğim
 
@@ -145,6 +145,13 @@ oldu hem de durum çubuğu ile hareket çubuğu çıktı. Yataylarda soldaki kam
   (Ayarlar ve ilerleme sadece cihazda kalıyor; cihazdan çıkmayan veri
   "toplama" sayılmaz.)
 - Haber / sağlık / finans / devlet uygulaması değil.
+
+## 6.1 Yayın günlüğü
+
+| Sürüm | versionCode | Ne değişti | Durum |
+|---|---|---|---|
+| 1.0.0 | 1 | İlk sürüm | Kapalı testte |
+| 1.0.1 | 2 | Emoji fontu gömüldü (her cihazda aynı emoji) | Yüklenmeyi bekliyor |
 
 ## 7. Yayın akışı
 
