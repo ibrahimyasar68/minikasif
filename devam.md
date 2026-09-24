@@ -13,7 +13,7 @@
 
 | Bilgi | Değer |
 |---|---|
-| Uygulama kimliği | `com.iylabs.minikasif` (henüz yayınlanmadı; yayından SONRA değiştirilemez) |
+| Uygulama kimliği | `com.iylabs.minikasif` — **Play'e yüklendi, ARTIK DEĞİŞTİRİLEMEZ** |
 | Ad | `MiniKasif` (her yerde; bitişik ve şapkasız yazım bilinçli) |
 | Sürüm | `1.0.0+1` (`pubspec.yaml`) |
 | Dart paket adı | `mini_kasif` (sadece iç import adı, değişmedi) |
@@ -231,6 +231,15 @@ sahibi `CN=Ibrahim YASAR`). Grafikler `design/magaza/` altında.
 Yeni paket gerektiğinde: `flutter build appbundle --release`, ardından
 `keytool -printcert -jarfile ...` ile imza kontrolü. Her yüklemede
 `pubspec.yaml` içindeki sürümün `+` sonrası artmalı.
+
+**Yayın durumu (24 Eylül 2026):** Paket Play Console'a yüklendi. Herkese
+açık mağaza sayfası (`play.google.com/store/apps/details?id=com.iylabs.minikasif`)
+o gün 404 veriyordu; kapalı/dahili test kanalında yayınlanmış ya da
+inceleme sürüyor olabilir. Kesin durum Console → Yayın → Genel bakış'ta.
+
+Bundan sonra her yeni yüklemede `pubspec.yaml` içindeki sürümün `+`
+sonrası (versionCode) artmalı: Play aynı versionCode'u ikinci kez kabul
+etmez.
 
 **Kalanlar senin (ayrıntı: `docs/play_store_hazirlik.md`):**
 - Play Console geliştirici hesabı.
