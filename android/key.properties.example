@@ -8,4 +8,6 @@
 storePassword=ANAHTAR_DEPOSU_PAROLASI
 keyPassword=ANAHTAR_PAROLASI
 keyAlias=upload
-storeFile=/Users/KULLANICI/iylabs-keys/minikasif-upload.jks
+# storeFile: .jks dosyasının TAM yolu. Dosya adının uygulama adıyla
+# ilgisi yoktur; mevcut anahtar ~/iylabs-keys/minikesif-upload.jks.
+storeFile=/Users/KULLANICI_ADI/anahtar-klasoru/anahtar.jks

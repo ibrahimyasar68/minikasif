@@ -60,6 +60,19 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  # Emoji fontu uygulamaya gömülü: emojiler her telefonda AYNI görünsün ve
+  # eski Android sürümlerinde eksik emoji olmasın (ör. Android 8'de 🥁).
+  # Sadece kullandığımız emojilere indirgendi (bkz. tool/emoji_fontu_uret.py).
+  fonts:
+    - family: NotoColorEmoji
+      fonts:
+        - asset: assets/fonts/NotoColorEmoji-subset.ttf
+
+  # Fontun lisansı (SIL OFL 1.1) uygulamayla birlikte gelmeli; açılışta
+  # Flutter'ın lisans listesine ekleniyor (main.dart).
+  assets:
+    - assets/fonts/NotoColorEmoji-OFL.txt
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

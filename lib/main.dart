@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -13,10 +15,24 @@ import 'theme/app_theme.dart';
 Future<void> main() async {
   // runApp'ten önce eklenti kullanacağımız için Flutter'ı hazırla.
   WidgetsFlutterBinding.ensureInitialized();
+  emojiLisansiniBildir();
   // Ayarları runApp'ten ÖNCE yükle. Yoksa uygulama bir an sistem temasıyla
   // açılıp sonra kayıtlı temaya geçer: ekran yanıp söner.
   final prefs = await SharedPreferences.getInstance();
   runApp(MiniKasifApp(prefs: prefs));
+}
+
+/// Gömülü emoji fontunun lisansını (SIL OFL 1.1) Flutter'ın lisans
+/// listesine ekler. OFL, fontun lisans metniyle birlikte dağıtılmasını
+/// şart koşuyor; bu kayıt sayesinde metin uygulamanın içinden okunabiliyor
+/// (Flutter'ın hazır "Lisanslar" ekranı).
+void emojiLisansiniBildir() {
+  LicenseRegistry.addLicense(() async* {
+    final metin = await rootBundle.loadString(
+      'assets/fonts/NotoColorEmoji-OFL.txt',
+    );
+    yield LicenseEntryWithLineBreaks(const ['NotoColorEmoji'], metin);
+  });
 }
 
 class MiniKasifApp extends StatelessWidget {
