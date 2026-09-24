@@ -1,6 +1,6 @@
 # MiniKasif — Devam Notu
 
-> Son güncelleme: 2026-09-24 · Son commit: `851b2cf` (PHASE 26 - emoji fontu)
+> Son güncelleme: 2026-09-24 · Son commit: `2500023` (sürüm 1.0.1+2)
 > Bu not, projeye ara verdikten sonra kaldığın yerden devam edebilmen için
 > hazırlandı. Yeni bir oturumda önce bu dosyayı ve `CLAUDE.md`'yi oku.
 
@@ -237,10 +237,12 @@ Tekrar düşmemek için bilinmesi gerekenler.
 
 İmza anahtarı hazır (`~/iylabs-keys/minikesif-upload.jks` — dosya adı eski
 adla kaldı, anahtarın uygulama kimliğiyle ilgisi yok; takma ad `upload`),
-`android/key.properties` dolu (git'e girmez), imzalı paket derlendi ve
-doğrulandı:
-`build/app/outputs/bundle/release/app-release.aab` (41,1 MB, sertifika
-sahibi `CN=Ibrahim YASAR`). Grafikler `design/magaza/` altında.
+`android/key.properties` dolu (git'e girmez). Grafikler `design/magaza/`
+altında.
+
+Son derlenen paket: `build/app/outputs/bundle/release/app-release.aab`
+— sürüm 1.0.1+2, sertifika sahibi `CN=Ibrahim YASAR`, SHA-256 yayındaki
+sürümle aynı (`7D:5C:D8:...`).
 
 Yeni paket gerektiğinde: `flutter build appbundle --release`, ardından
 `keytool -printcert -jarfile ...` ile imza kontrolü. Her yüklemede
@@ -255,12 +257,16 @@ Bundan sonra her yeni yüklemede `pubspec.yaml` içindeki sürümün `+`
 sonrası (versionCode) artmalı: Play aynı versionCode'u ikinci kez kabul
 etmez.
 
+✅ Yapılanlar: Play Console hesabı, mağaza formları, 1.0.0+1 ile kapalı
+test yayını, gizlilik politikasının yayınlanması.
+
 **Kalanlar senin (ayrıntı: `docs/play_store_hazirlik.md`):**
-- Play Console geliştirici hesabı.
-- Yeni kişisel hesaplarda yayından önce kapalı test (bilinen kural:
-  12 test kullanıcısı, 14 gün; güncel şartı Play Console'da kontrol et).
-- Mağaza formları: hedef kitle 0–5 (Aileler Politikası), veri güvenliği
-  ("veri toplanmıyor"), içerik derecelendirmesi.
+- 1.0.1+2 paketini kapalı teste yüklemek.
+- Test cihazlarında, özellikle **Samsung Galaxy A7'de (Android 8)**
+  emojilerin göründüğünü doğrulamak. PHASE 26'nın asıl amacı buydu ve
+  emülatörde kanıtlanamayan tek nokta bu.
+- Kapalı test süresi dolunca üretime çıkmak (bilinen kural: 12 test
+  kullanıcısı, 14 gün; güncel şartı Play Console'da kontrol et).
 - `.jks` dosyasını ve parolaları yedeklemek.
 
 ### 6.2 PHASE 27 — Gerçek görseller ⬜ (isteğe bağlı)
@@ -276,9 +282,8 @@ eksiksiz. Özgün çizimler istenirse:
 - Kendin sağlarsın.
 - Açık lisanslı set (OpenMoji, Twemoji): indirmek için açık onay ve
   uygulamada kaynak belirtme gerekir.
-- Alternatif (daha ucuz, ayrı bir safha): emoji kalır, emoji fontu
-  (~10 MB) uygulamaya gömülür. Emojiler her telefonda aynı görünür ve
-  eski cihaz sorunu biter, ama görünüm özgünleşmez.
+(Üçüncü seçenek olan "emoji fontunu göm" PHASE 26'da uygulandı; bu safha
+yalnızca görünümü özgünleştirmek için.)
 
 ### 6.3 Bekleyen küçük işler ve açık kararlar
 
@@ -305,8 +310,7 @@ ekranı, arka plan müziği ve müzik ayarı.
 
 1. Bu dosyayı ve `CLAUDE.md`'yi oku.
 2. `flutter test` ile 203 testin geçtiğini doğrula.
-3. Sıradaki iş: kod tarafında **6.2** (gerçek görseller) — başlamadan
-   önce görsel kaynağı kararını ver. Yayın tarafında iş AI'da değil:
-   **6.1**'deki "Kalanlar senin" listesi (Play Console hesabı, gizlilik
-   politikasının yayınlanması, kapalı test, mağaza formları).
+3. Sıradaki iş: kod tarafında zorunlu bir şey kalmadı; **6.2** (gerçek
+   görseller) isteğe bağlı ve başlamadan önce görsel kaynağı kararı
+   gerekiyor. Yayın tarafı **6.1**'deki "Kalanlar senin" listesinde.
 4. Bu notu her safha sonunda güncelle (tamamlananlar tablosu ve plan).
