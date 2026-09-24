@@ -1,6 +1,6 @@
 # MiniKasif — Devam Notu
 
-> Son güncelleme: 2026-09-23 · Son commit: `e4250cc` (PHASE 25.8 - ad değişikliği)
+> Son güncelleme: 2026-09-24 · Son commit: `851b2cf` (PHASE 26 - emoji fontu)
 > Bu not, projeye ara verdikten sonra kaldığın yerden devam edebilmen için
 > hazırlandı. Yeni bir oturumda önce bu dosyayı ve `CLAUDE.md`'yi oku.
 
@@ -21,7 +21,7 @@
 | Flutter | 3.35.6 stable, Dart SDK ^3.9.2 |
 | Paketler | `provider`, `flutter_tts`, `shared_preferences` (+ `cupertino_icons`) |
 | İçerik | 3 bölüm × 10 soru = 30 soru |
-| Testler | 30 test dosyası, **202 test** (hepsi geçiyor) |
+| Testler | 30 test dosyası, **203 test** (hepsi geçiyor) |
 | Depo | https://github.com/ibrahimyasar68/minikasif (herkese açık) |
 | Gizlilik politikası | https://ibrahimyasar68.github.io/minikasif/gizlilik_politikasi.html (GitHub Pages, kökteki `gizlilik_politikasi.md`) |
 | Hedef | Play Store'da yayınlamak |
@@ -91,6 +91,8 @@ Diğer klasörler:
 | Yol | İçerik |
 |---|---|
 | `tool/ikon_uret.py` | Uygulama ikonunu koddan üretir (Pillow) |
+| `tool/emoji_fontu_uret.py` | Gömülü emoji fontunu üretir (altküme) |
+| `assets/fonts/` | Gömülü emoji fontu ve OFL lisansı |
 | `design/ikon/` | 1024 px ana ikon, 512 px Play Store ikonu |
 | `design/magaza/` | Mağaza ekran görüntüleri ve 1024×500 tanıtım görseli |
 | `tool/tanitim_gorseli.py` | Tanıtım görselini koddan üretir |
@@ -99,12 +101,13 @@ Diğer klasörler:
 | `android/key.properties.example` | İmza bilgisi şablonu (parolasız) |
 | `test/yatay_ekran_test.dart` | Pixel 6 yatayda her ekran kaydırmadan görünür mü |
 | `test/ekran_yonu_test.dart` | Manifest'te screenOrientation="sensor" mı |
+| `test/data/emoji_fontu_test.dart` | Çizilen her emoji gömülü fontta var mı |
 | `test/gizlilik_politikasi_test.dart` | Politikadaki e-posta uygulamadakiyle aynı mı, yer tutucu kaldı mı |
 | `test/soru_gecisi_test.dart` | Soru geçişinde iki metin üst üste binmiyor mu |
 | `test/app_adi_test.dart` | Launcher adı ile uygulama içi ad eşit mi |
 | `test/helpers/oyun.dart` | Cevapları veriden okuyan ortak test adımları |
 | `test/helpers/gercek_font.dart` | Yerleşim testleri için gerçek Roboto fontu |
-| `test/fixtures/android8_emoji_kapsami.txt` | Android 8 emoji fontunun karakter listesi |
+| `test/fixtures/emoji_fontu_kapsami.txt` | Gömülü fontun kapsadığı kod noktaları (betik üretir) |
 
 ---
 
@@ -140,6 +143,7 @@ Diğer klasörler:
 | 25.7 | Mağaza görselleri, tanıtım görseli, derleme güvencesi | `85a0586` |
 | 25 (kalan) | İmza anahtarı, imzalı `.aab`, imza doğrulaması | `93f0b25` |
 | 25.8 | Ad ve kimlik: MiniKasif / com.iylabs.minikasif | `e4250cc` |
+| 26 | Emoji fontu gömüldü (Noto altkümesi, 53 KB); Android 8 kapsam testi kalktı | `851b2cf` |
 
 Her commit mesajında o safhanın ayrıntılı açıklaması var:
 `git log` ile okunabilir.
@@ -190,6 +194,9 @@ Tekrar düşmemek için bilinmesi gerekenler.
   döndürme ayarını da açıyor, deneyi bozuyor.
 - Flutter, Gradle uyarılarını ekranda göstermez. Önemli durumlar hata
   olarak verilmeli.
+- `android/key.properties` git'e girmiyor; bir kez şablon değerlerine
+  DÖNMÜŞ ve derleme "Keystore file ... not found" hatası vermişti. Yeni
+  sürüm yüklemeden önce `flutter build appbundle --release` ile dene.
 - `android/key.properties` yoksa `.aab` derlemesi hata verir ve önceki
   derlemeden kalan `app-release.aab` varsa siler. (Bir kez, güvence
   eklenmeden önce derlenmiş debug imzalı bir paket klasörde kalmıştı;
@@ -212,8 +219,15 @@ Tekrar düşmemek için bilinmesi gerekenler.
   `tester.pump()` gerekir.
 - Testlerde uygulama `MiniKasifApp(audio: SilentAudioService())` ile
   açılmalı. Gerçek TTS'in test ortamında "bitti" haberi hiç gelmez.
-- Yeni emoji eklerken Android 8 kapsam testi eski cihazlarda görünmeyen
-  emojiyi yakalar.
+- **Emoji fontu gömülü.** Yeni emoji eklenince
+  `python3 tool/emoji_fontu_uret.py <NotoColorEmoji.ttf>` çalıştırılmalı;
+  yoksa emoji telefonda BOŞ KUTU çıkar (test yakalar). Kaynak fontun
+  indirme komutu betiğin başında: Google Fonts modern tarayıcıya woff2
+  veriyor, TTF için eski bir tarayıcı kimliği gerekiyor.
+- Emojinin gerçekten gömülü fonttan çizildiğini görmek için fontta bir
+  emojiyi başka bir glife bağlayıp ekrana bakmak yeterli (PHASE 26'da
+  elma -> muz ile doğrulandı). Pixel emülatörü de Noto kullandığı için
+  çıplak gözle ayırt edilemez.
 
 ---
 
@@ -232,10 +246,10 @@ Yeni paket gerektiğinde: `flutter build appbundle --release`, ardından
 `keytool -printcert -jarfile ...` ile imza kontrolü. Her yüklemede
 `pubspec.yaml` içindeki sürümün `+` sonrası artmalı.
 
-**Yayın durumu (24 Eylül 2026):** Paket Play Console'a yüklendi. Herkese
-açık mağaza sayfası (`play.google.com/store/apps/details?id=com.iylabs.minikasif`)
-o gün 404 veriyordu; kapalı/dahili test kanalında yayınlanmış ya da
-inceleme sürüyor olabilir. Kesin durum Console → Yayın → Genel bakış'ta.
+**Yayın durumu (24 Eylül 2026):** **Kapalı test yayını başladı.** Kapalı
+test kanalının herkese açık mağaza sayfası olmaz; bu yüzden
+`play.google.com/store/apps/details?id=com.iylabs.minikasif` 404 veriyor,
+bu beklenen durum. Üretime çıkınca o adres açılacak.
 
 Bundan sonra her yeni yüklemede `pubspec.yaml` içindeki sürümün `+`
 sonrası (versionCode) artmalı: Play aynı versionCode'u ikinci kez kabul
@@ -249,9 +263,10 @@ etmez.
   ("veri toplanmıyor"), içerik derecelendirmesi.
 - `.jks` dosyasını ve parolaları yedeklemek.
 
-### 6.2 PHASE 26 — Gerçek görseller ⬜
+### 6.2 PHASE 27 — Gerçek görseller ⬜ (isteğe bağlı)
 
-Kartlarda emoji yerine resim.
+PHASE 26'da emoji fontu gömüldü: emojiler artık her cihazda aynı ve
+eksiksiz. Özgün çizimler istenirse:
 - `AnswerOption`'a `imagePath`; görsel yoksa ya da yüklenemezse emojiye
   düşülecek (kart asla boş kalmayacak).
 - Görseller `assets/images/` altına, `pubspec.yaml`'a tanım.
@@ -274,8 +289,9 @@ Kartlarda emoji yerine resim.
       eskileri telefondan elle sil.
 - [ ] **Telaffuz kontrolü:** "İneği", "Şemsiyeyi" gibi kelimelerin TTS
       telaffuzu kulakla dinlenmedi.
-- [ ] Samsung emoji tasarımında üzüm morumsu pembe görünüyor
-      ("Mor üzümü bul" sorusu).
+- [ ] **İsteğe bağlı:** PHASE 19.1'de Android 8'de görünmediği için
+      🧸 yerine 🥁 konmuştu. Font gömüldüğü için bu kısıt kalktı;
+      istenirse oyuncak ayı geri gelebilir.
 
 ### 6.4 MVP sonrası fikir havuzu
 
@@ -288,7 +304,7 @@ ekranı, arka plan müziği ve müzik ayarı.
 ## 7. Kaldığın yerden devam etmek için
 
 1. Bu dosyayı ve `CLAUDE.md`'yi oku.
-2. `flutter test` ile 202 testin geçtiğini doğrula.
+2. `flutter test` ile 203 testin geçtiğini doğrula.
 3. Sıradaki iş: kod tarafında **6.2** (gerçek görseller) — başlamadan
    önce görsel kaynağı kararını ver. Yayın tarafında iş AI'da değil:
    **6.1**'deki "Kalanlar senin" listesi (Play Console hesabı, gizlilik
